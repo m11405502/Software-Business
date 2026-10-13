@@ -6,201 +6,267 @@
 
 ## 1. Project overview
 
-This project proposes a **private, contractor-controlled, web-based SaaS platform** for small- and medium-sized general contractors in Taiwan. It manages three construction-resource categories: **material suppliers**, **subcontractors/specialist service providers**, and **equipment/heavy-equipment providers**.
+This project plans a **private, contractor-controlled web application** for small- and medium-sized general contractors in Taiwan. It covers **material suppliers**, **subcontractors/specialist service providers**, and **equipment providers**. The platform connects company-level provider records to project-level procurement activities: requirement definition, provider shortlisting, requests for quotation (RFQs), responses, quotation comparison, provider selection, fulfillment, and post-engagement evaluation. Its decision-support functions assist rather than replace human procurement judgment.
 
-The platform connects **company-level provider knowledge** with **project-level procurement activities**. Contractors can retain supplier information and performance evidence across projects, while project teams define requirements, issue requests for quotation (RFQs), compare offers, record selections, monitor fulfillment, and evaluate provider performance. **People make provider-selection and contract-award decisions; the system provides decision support only.**
+**Knowledge loop:** Import existing provider knowledge → project requirement → shortlist → RFQ → supplier response → comparison → manual selection → fulfillment → contractor-confirmed outcome → evaluation → updated company provider history → future project reuse.
 
-**Core knowledge loop:** Provider history → project requirement → shortlist → RFQ → supplier response → comparison → selection → fulfillment → evaluation → updated company knowledge → future reuse.
+**Commercial model:** Contractors pay a tiered SaaS subscription; basic supplier participation is free, with no commission on quotations or awards. This is **not** a public marketplace or a replacement for ERP, BIM, payroll, accounting, or full project-management software.
 
-**Business model:** Contractors pay tiered SaaS subscriptions; basic supplier participation is free. The platform is **neither a public marketplace nor a replacement for ERP, BIM, accounting, payroll, or full project-management systems**.
+## 2. Users, authorization boundaries, and entry points
 
-## 2. Proposed website organization — primary Mermaid sitemap
+| Role | Intended scope | Entry point |
+|---|---|---|
+| Company Administrator | Company configuration, users, roles, and project assignments | Authenticated contractor workspace |
+| Company Procurement / Supplier Manager | Company-wide provider directory, initial historical tags, provider history | Authenticated contractor workspace |
+| Project Manager | Assigned projects; compare proposals, select providers, verify fulfillment, evaluate | Authenticated project workspace |
+| Project Procurement Staff | Assigned projects; requirements, shortlisting, RFQs, comparison | Authenticated project workspace |
+| Supplier / Service Provider | Only its specific invitation or awarded engagement; no competitor quotations or contractor-only reviews | **Purpose-limited, passwordless mobile links**, not internal login |
 
-The sitemap is the main diagram for Assignment #2. It shows **proposed pages, page groups, and entry points** (not database tables or backend jobs). **[SY]**, **[HY]**, and **[Both]** indicate *proposed leads*, subject to team confirmation.
+**Tenant isolation:** Company A must not access Company B's records. Within a contractor, users receive only their authorized company and assigned-project access. These are **server-enforced** rules, not merely hidden menu items.
 
-**Color legend:** 🟩 **P0 / Must-have** — minimal MVP pages; 🟨 **P1 / Should-have** — later enhancements; ⬜ **P2 / Post-MVP** — deferred features; 🟦 **navigation groups or entry points** — organizational labels, not feature priorities.
+**Supplier access has two distinct purposes:** (1) an invitation-specific **RFQ response link**, and (2) a separately issued **post-award fulfillment update link**, only for the selected provider. Neither link grants general access to the contractor workspace.
+
+## 3. Planned website organization (Mermaid)
+
+Diagrams show **web pages or entry points**, not the database or background calculations. Each leaf shows proposed responsible lead: **[HY]**, **[SY]**, or **[Both]**. 
+
+**Color meaning:** 🟩 **P0** = required MVP page; 🟨 **P1** = secondary enhancement; ⬜ **P2** = post-MVP; 🟦 = navigation grouping, not a feature-priority claim.
+
+### 3.1 Internal contractor website
 
 ```mermaid
-flowchart TD
-    %% Root Level
-    HOME["Homepage / Landing Page<br/>[Both]"]
+flowchart TB
+    ROOT["Contractor Website [Both]"] --> LOGIN["Sign-in [HY]"]
+    LOGIN --> CO["Company Workspace"]
+    LOGIN --> PR["Assigned Project Workspace"]
 
-    %% Level 1: Main Entry Points
-    HOME --> LOGIN["Contractor Portal<br/>[HY]"]
-    HOME --> SUP_ENTRY["Supplier Entry (Link/Portal)<br/>[SY]"]
+    CO --> ACCESS["Users and Roles [HY]"]
+    CO --> ASSIGN["Projects and Team Assignments [HY]"]
+    CO --> DIR["Provider Directory [HY]"]
+    DIR --> PROFILE["Provider Profile and History [HY]"]
+    DIR --> IMPORT["Import and Retro-Ratings [HY]"]
+    CO --> LABELS["Provider Status Labels [HY]"]
+    CO --> DASH["Cross-Project Dashboard [Both]"]
 
-    %% Level 2: Contractor Workspaces
-    LOGIN --> CO["Company Workspace<br/>[HY]"]
-    LOGIN --> PROJ["Project Workspace<br/>[SY]"]
+    PR --> REQ["Resource Requirement [SY]"]
+    PR --> SHORT["Search and Shortlist [SY]"]
+    PR --> RFQ["RFQ Creation and Invitations [SY]"]
+    PR --> CMP["Category-Aware Quote Comparison [SY]"]
+    PR --> AWARD["Select Provider and Commitments [SY]"]
+    PR --> TRACK["Fulfillment and PM Confirmation [HY]"]
+    PR --> EVAL["Completion Evaluation [SY]"]
 
-    %% Level 3: Company Workspace Pages
-    CO --> USERS["Users & Role Mgt<br/>[HY]"]
-    CO --> TEAM["Projects & Team Assignment<br/>[HY]"]
-    CO --> DIRECTORY["Provider Directory<br/>[HY]"]
-    CO --> DASH["Cross-Project Dashboard<br/>[Both]"]
+    classDef nav fill:#dbeafe,stroke:#2563eb,color:#0f172a;
+    classDef p0 fill:#dcfce7,stroke:#15803d,color:#052e16;
+    classDef p1 fill:#fef3c7,stroke:#b45309,color:#422006;
+    class ROOT,CO,PR nav;
+    class LOGIN,ACCESS,ASSIGN,DIR,PROFILE,IMPORT,REQ,SHORT,RFQ,CMP,AWARD,TRACK,EVAL p0;
+    class LABELS,DASH p1;
+```
 
-    %% Level 4: Directory Sub-pages
-    DIRECTORY --> PROFILE["Provider Profile<br/>[HY]"]
-    DIRECTORY --> IMPORT["CSV Import & Retro-Ratings<br/>[HY]"]
-    DIRECTORY --> STATUS["Provider Status Labels<br/>[HY]"]
+**Interpretation:** The login diagram expresses possible navigation, **not** universal access to both workspaces. Authorization decides which pages each user can use. Calculations such as response timing and schedule deviation occur behind these pages; they are not separate website pages.
 
-    %% Level 3: Project Workspace Pages
-    PROJ --> REQUIRE["Resource Requirements<br/>[SY]"]
-    PROJ --> SHORT["Provider Search & Shortlist<br/>[SY]"]
-    PROJ --> RFQ["RFQ Creation & Invitations<br/>[SY]"]
-    PROJ --> MATRIX["Quotation Comparison<br/>[SY]"]
-    PROJ --> AWARD["Provider Selection<br/>[SY]"]
-    PROJ --> TRACK["Fulfillment Tracking<br/>[HY]"]
-    PROJ --> EVAL["Completion Evaluation<br/>[SY]"]
+### 3.2 External supplier access (separate authorization paths)
 
-    %% Level 3: Supplier Pages
-    SUP_ENTRY --> VIEW["View Assigned RFQ<br/>[SY]"]
-    SUP_ENTRY --> QUOTE["Submit Quote & Docs<br/>[SY]"]
-    SUP_ENTRY --> UPDATE["Fulfillment Update<br/>[HY]"]
-    SUP_ENTRY --> BASIC["Basic Self-Service<br/>[Both]"]
-    SUP_ENTRY --> FULL["Full Profiles & Certificates<br/>[Both]"]
+```mermaid
+flowchart TB
+    RFQISSUE["Contractor Issues RFQ [SY]"] --> TOKEN1["RFQ Response Link [SY]"]
+    TOKEN1 --> VIEW["View Invited RFQ [SY]"]
+    VIEW --> REPLY["Enter Quote and Availability [SY]"]
+    REPLY --> SEND["Submit RFQ Response [SY]"]
 
-    %% --- Styling (Colors & Priority) ---
-    classDef group fill:#dbeafe,stroke:#2563eb,color:#0f172a,stroke-width:1.5px;
-    classDef p0 fill:#dcfce7,stroke:#15803d,color:#052e16,stroke-width:1.5px;
-    classDef p1 fill:#fef3c7,stroke:#b45309,color:#422006,stroke-width:1.5px;
-    classDef p2 fill:#e5e7eb,stroke:#6b7280,color:#111827,stroke-width:1.5px;
+    AWARD["Contractor Selects Provider [SY]"] -.->|"New scoped token after award"| TOKEN2["Post-Award Fulfillment Link [SY]"]
+    TOKEN2 --> UPD["Report Fulfillment Progress [HY]"]
+    UPD --> CONFIRM["PM Reviews Report [HY]"]
 
-    %% Apply Styles
-    class HOME,LOGIN,SUP_ENTRY,CO,PROJ group;
-    class USERS,TEAM,DIRECTORY,PROFILE,IMPORT,REQUIRE,SHORT,RFQ,MATRIX,AWARD,TRACK,EVAL,VIEW,QUOTE,UPDATE p0;
-    class STATUS,DASH,BASIC p1;
+    PORTAL["Optional Supplier Portal [Both]"] --> BASIC["Basic Self-Service [Both]"]
+    BASIC --> FULL["Full Profiles and Certificates [Both]"]
+
+    classDef nav fill:#dbeafe,stroke:#2563eb,color:#0f172a;
+    classDef p0 fill:#dcfce7,stroke:#15803d,color:#052e16;
+    classDef p1 fill:#fef3c7,stroke:#b45309,color:#422006;
+    classDef p2 fill:#e5e7eb,stroke:#6b7280,color:#111827;
+    class RFQISSUE,AWARD nav;
+    class TOKEN1,VIEW,REPLY,SEND,TOKEN2,UPD,CONFIRM p0;
+    class PORTAL,BASIC p1;
     class FULL p2;
 ```
 
-**Important access interpretation:**
+**Important:** The post-award link is **not a continuation of RFQ-link permission**. Awarding a provider triggers issuance of a separate permission for that awarded engagement. Unselected providers never receive fulfillment-update access. The optional portal is not necessary for no-login P0 participation.
 
-- Contractor login grants only the **company/project pages authorized by role, company, and project assignment**; showing two workspaces does not mean every internal user can enter both.
-- The external supplier interface is **not linked from the public homepage**. A project procurement user sends an individual invitation containing a restricted, mobile-friendly URL. The dashed RFQ arrow indicates **invitation delivery**, not normal website navigation.
-- A supplier can see only the designated RFQ and explicitly permitted follow-up actions. A fulfillment update may need a **new, separately authorized follow-up link** after provider selection. Suppliers cannot view competing quotes or internal evaluations.
-- The P1 supplier portal is a **future alternative** to no-login links, not a prerequisite for P0. The P2 full-profile screen is shown only for future planning.
-- Response timing, response-rate calculations, schedule variance, token verification, authorization, and persistence are **system behaviors**, not separate sitemap pages.
+## 4. MVP scope and quotation comparison
 
-## 3. Target users and access boundaries
+| Priority | Planned functionality | Test of completion |
+|---|---|---|
+| **P0 — Must-have** | Company/project access; provider directory for **all three categories**; initial provider records and simple retro-ratings; requirements, shortlist, RFQ, secure mobile response; manual selection; fulfillment reporting and PM confirmation; basic completion evaluation; system-recorded metrics and company history reuse | Demonstrate a complete requirement-to-reuse journey. **First detailed end-to-end example: materials.** |
+| **P1 — Should-have** | Bulk CSV/Excel import refinements and duplicate detection; provider labels; cross-project dashboard; lightweight supplier self-service; expanded category-specific comparison templates | Improves scale and usability after core journey succeeds |
+| **P2 — Post-MVP** | Full supplier catalogs/certifications, predictive analytics, advanced scoring, ERP/API integrations, automated contract-award decisions | Excluded from first MVP validation |
 
-| Actor | Authorized scope | Proposed interface |
-| --- | --- | --- |
-| **Company Administrator** | Company account, users, roles, projects, and assignments | Internal company workspace |
-| **Company Procurement / Supplier Manager** | Company-wide provider directory and performance history | Internal company workspace |
-| **Project Manager** | Assigned projects; quotation review, selection, and evaluation | Internal project workspace |
-| **Project Procurement Staff** | Assigned projects; requirements, shortlists, RFQs, and comparisons | Internal project workspace |
-| **Supplier / Service Provider** | Only specifically authorized RFQ responses and subsequent permitted updates | Secure **no-login mobile link** (P0); optional portal (P1/P2) |
+**Scope decision for the two-person implementation:** The source proposal treats CSV/Excel import as Must-have. This development plan retains the feature as the **target P0**, but allows a documented contingency: demonstrate manual entry of approximately ten sample providers if import threatens the integration deadline. That contingency is **a proposed deviation requiring team/lecturer approval**, not a silent reinterpretation of the proposal. Likewise, the proposal's basic supplier portal is Should-have (P1), and full profile management is Post-MVP (P2).
 
-**Confidentiality rule:** Supplier-facing views must never expose competitors' quotations or contractor-only ratings, comments, and selection deliberations.
+### Category-aware quotation fields
 
-## 4. Planned pages and user-story traceability
+All categories share: provider identity, RFQ/requirement ID, quoted amount and currency, availability, lead/commitment date, quote validity, payment terms, and inclusions/exclusions. The **first P0 demonstration** should use a complete **materials** template. The data model should admit other categories without implying identical pricing bases.
 
-The story references below follow **Section 11.1 (User Stories)** of the September 2026 proposal *as reported in the original README*. That README notes inconsistent identifiers in proposal Section 13; the referenced proposal should be checked before final submission. A page may implement more than one story.
+| Resource category | Additional comparison fields | Comparability check |
+|---|---|---|
+| **Materials — first full demo** | Material specification, quantity, unit (e.g., ton, m³), unit price, delivery destination and terms | Same specification and units; distinguish unit price from total price |
+| Subcontractors/services — subsequent template | Work scope, lump sum/unit rate, workforce capacity, duration, exclusions | Same defined scope, units, and inclusions; flag unpriced exclusions |
+| Equipment — subsequent template | Equipment type/capacity, rental unit/duration, operator inclusion, mobilization cost | Same equipment requirement, rental basis, and included services |
 
-| Planned page / interface | Principal role | User-story reference | Priority | Proposed lead |
-| --- | --- | --- | --- | --- |
-| Contractor sign-in; users and role management | Company Administrator | CA-02 | P0 | HY |
-| Projects and team assignment | Company Administrator | CA-03 | P0 | HY |
-| Provider directory; basic profile and history | Company Procurement Manager | CPM-01, CPM-04 | P0 | HY, with SY on metrics integration |
-| **Basic CSV** import and labeled historical retro-ratings | Company Procurement Manager | CPM-02 | P0 | HY |
-| Resource requirements | Project Procurement Staff | PPS-01 | P0 | SY |
-| Provider search and shortlist | Project Procurement Staff | PPS-02 | P0 | SY |
-| RFQ creation, invitations, and secure link issuance | Project Procurement Staff | PPS-03, PPS-04 | P0 | SY |
-| Restricted RFQ view; quote, availability, and document submission | Supplier / Service Provider | SUP-01, SUP-02 | P0 | SY |
-| Quotation and available provider-history comparison | Project Procurement Staff / Project Manager | PPS-05, PM-01 | P0 | SY |
-| Manual provider selection and committed dates | Project Manager | PM-01, PM-02 | P0 | SY |
-| **Fulfillment tracking and authorized supplier updates** | Project Manager / Supplier | PM-02, SUP-03 | P0 | **HY** |
-| Brief post-completion evaluation | Project Manager | PM-03 | P0 | SY |
-| Configurable provider status labels | Company Procurement Manager | Related to CPM-01; no separate story | P1 | HY |
-| Cross-project dashboard | Company Procurement Manager | CPM-04 (expanded display) | P1 | Both |
-| Optional basic supplier self-service portal | Supplier / Service Provider | Related to SUP-04 (limited scope) | P1 | Both |
-| Full provider catalogs, profiles, and certificates | Supplier / Service Provider | SUP-04 | P2 | Both |
+**Comparison behavior:** Highlight missing fields or inconsistent units/scope as **“not directly comparable.”** Do not rank by raw price alone; display evidence and leave selection to the authorized Project Manager. Supporting quote files can be deferred from an initial working skeleton if a safe structured-text response is available; final P0 file-upload scope remains subject to scheduling and safe-upload tests.
 
-**Other requirements:** Subscription administration (**CA-01**) and proactive reminders (**PM-04**) are not P0 demonstration pages. Automated response-time and schedule-variance measurements are proposed P0 *system behaviors* (identified as SR-01/SR-02 in the original README); confidentiality requirements (SR-03/SR-04) are cross-cutting. Full story wording and IDs require final checking against the proposal.
+## 5. Verified user-story traceability
 
-## 5. MVP priorities and implementation boundaries
+Identifiers below are checked against **Section 11.1** of the September 2026 proposal, **not** its inconsistent Section 13 traceability table. This table refers to planned functions; a story may span multiple pages. *System requirements* SR-01–SR-04 in Section 11.2 are tracked separately, and SR-01/SR-02 concern metrics rather than security despite that section's heading.
 
-The **P0 business journey remains end-to-end**, but each capability is deliberately scoped to a small, demonstrable version suitable for a two-person implementation.
+| Website page / feature | Source user stories (Section 11.1) | Priority / note | Lead |
+|---|---|---|---|
+| Company sign-in, roles, permissions | **CA-02** | P0 | HY |
+| Project creation and team assignments | **CA-03** | P0 | HY |
+| Company subscription/account administration | **CA-01** | Later commercial scope | HY (proposed) |
+| Provider directory, company provider record | **CPM-01** | P0 | HY |
+| Provider import and historical tags | **CPM-02** | P0 target; manual-entry fallback requires approval | HY |
+| Invite or onboard provider | **CPM-03** | P0, through RFQ invitations/basic provider registration | SY + HY |
+| Cross-project performance dashboard | **CPM-04** | P1 dashboard; underlying provider history is P0 | Both |
+| Requirement creation and shortlist | **PPS-01, PPS-02** | P0 | SY |
+| RFQ issue and secure response-link generation | **PPS-03, PPS-04** | P0 | SY |
+| Automatic comparison matrix | **PPS-05** | P0 (materials fully demonstrated) | SY |
+| Review proposals against history and select provider | **PM-01** | P0 | SY |
+| Committed dates and fulfillment tracking | **PM-02** | P0 | HY + SY |
+| Post-completion evaluation | **PM-03** | P0 short form | SY |
+| Delayed-response and delivery alerts | **PM-04** | Deferred; not a standalone P0 page | To assign |
+| View RFQ from no-login link | **SUP-01** | P0 | SY |
+| Upload/submit quote and availability | **SUP-02** | P0 target; safe file upload may be staged | SY |
+| Report progress through **separate** post-award link | **SUP-03** | P0 | HY (page); SY (token) |
+| Optional full self-managed profile | **SUP-04** | P2 full profile; P1 portal is a smaller, **related** future capability, not fulfillment of SUP-04 | Both |
 
-| Priority | Scope | Evidence of completion |
-| --- | --- | --- |
-| **🟩 P0 — Must-have** | Role/project access; provider directory; **basic CSV import** with required fields and simple, labeled retro-ratings; requirements and shortlist; RFQ and individual restricted response links; one quotation with optional file attachment per invited provider; simple side-by-side comparison; human selection and committed dates; milestone status/actual dates; automated response time and schedule variance when data exists; brief evaluation; company-history update | Demonstrate **import → requirement → RFQ → supplier response → comparison → selection → fulfillment → evaluation → reuse** using sample data |
-| **🟨 P1 — Should-have** | Improved CSV/Excel import and duplicate detection; configurable status labels; cross-project dashboard; basic supplier self-service portal; usability enhancements | Add after the P0 workflow is stable |
-| **⬜ P2 — Post-MVP** | Full supplier catalogs/certificates; predictive delay analytics; advanced multi-criteria scoring; ERP/API integration; broader workflow automation; **cost-variance reporting if comparable committed and actual cost data are captured** | Consider after pilot feedback and data availability |
+**Nonfunctional/system requirements:** **SR-01** = response metrics, **SR-02** = schedule variance, **SR-03** = commercial confidentiality, **SR-04** = internal evaluation confidentiality. Every P0 integration must preserve SR-03 and SR-04.
 
-**Scope decisions:**
+## 6. Secure link lifecycle and data protection
 
-- **Import:** P0 supports one documented CSV template and manual review of existing/history fields. Complex Excel parsing, bulk deduplication, and historical data migration are deferred.
-- **RFQs and comparison:** P0 supports a simple quotation form and a transparent comparison table; no automatic contract award, payment processing, or sophisticated optimization.
-- **Fulfillment:** P0 tracks a small set of committed versus actual milestone dates and authorized status updates, rather than a full construction schedule.
-- **Metrics:** *Response time* = supplier submission timestamp − RFQ invitation timestamp; *schedule variance* = actual milestone date − committed milestone date. Display missing/unavailable values rather than fabricating performance scores. Label retro-ratings as subjective historical assessments.
-- **Cost variance:** This is **not promised as an automatic P0 metric**. It requires defined baseline/committed price, actual cost, consistent scope and units, and clear handling of change orders; evaluate it for P2 when those data can be collected.
-- **Supplier portal:** Proposal-reported distinction remains **P1 lightweight self-service** versus **P2 full profile maintenance**. SaaS subscription administration is a separate later commercial need, not P0.
+**Proposed technical policy to validate before implementation:**
 
-## 6. P0 acceptance criteria (testable demonstrations)
+1. Generate cryptographically unpredictable bearer tokens and store only a **server-side hash** of each token. Use HTTPS and do not log raw tokens.
+2. Bind each token to **contractor/tenant, provider, RFQ or awarded engagement, action/purpose**, and a defined validity window. Validate all boundaries on the server for every request.
+3. **RFQ tokens** expire at the response deadline plus a **configurable grace period** (provisional default: 24 hours); revoke when an RFQ is cancelled, a provider's invitation is withdrawn, or the award makes the RFQ response obsolete. Exact timing must be approved by the team.
+4. After selection, issue a **new fulfillment token** only to the selected provider for the relevant engagement. Revoke on completion, cancellation, access compromise, or reaward. Set a limited expiry with a renewal process for long-running engagements.
+5. Maintain an audit record of invitation, submissions, selection, date confirmation, token issuance/revocation, and material changes. Do not expose tokens to third-party analytics or referrals.
+6. Consider an out-of-band one-time code for fulfillment updates if usability and threat assessment justify it; it is not assumed in initial P0 scope. Forwarded bearer links remain a risk even when tokens are unguessable.
+7. Validate and limit uploads (type, size, storage access); sanitize displayed content. Supplier users must never view competing quotes, private ratings, or unrelated projects.
 
-These criteria are proposed **implementation tests**, not claims that the pages exist.
+**Personal and commercial data:** Supplier contact details and named evaluations should be collected only as needed, access-restricted, auditable, and subject to a retention/deletion policy. Confirm applicable Taiwan data-protection requirements with qualified guidance before deploying real customer data; this README does **not** claim legal compliance.
 
-| ID | Feature / expected behavior | Acceptance criterion |
-| --- | --- | --- |
-| AC-01 | Role and project access | An assigned project user can access their project; an unassigned user is denied server-side access. |
-| AC-02 | Provider onboarding | A valid sample CSV imports providers into the company directory; source-tagged retro-ratings remain distinguishable from system metrics. |
-| AC-03 | Requirements and RFQ | Project Procurement Staff can save a requirement, shortlist providers, create an RFQ, and generate **provider-specific** invitation links. |
-| AC-04 | Secure supplier response | An invited supplier can view only their assigned RFQ and submit price, availability, proposed dates, and an allowed file; an invalid or expired link is rejected. |
-| AC-05 | Comparison and selection | Authorized project users can compare submitted quotations with available prior provider evidence; the Project Manager manually records the selected provider and committed dates. |
-| AC-06 | Fulfillment | An authorized supplier can submit a permitted progress update, and the project workspace records actual milestone dates without exposing other RFQs. |
-| AC-07 | Evaluation and reuse | After completion, a short evaluation and calculable response/schedule evidence appear in the company provider history and are available to another **authorized** project. |
-| AC-08 | Data confidentiality | Supplier access does not reveal competing offers, confidential internal assessments, or another company's project records. |
+**Interface language (planning assumption):** Traditional Chinese first for Taiwan-based contractor and supplier workflows; English labels/help may be added when practical. Confirm language preferences during pilot interviews.
 
-## 7. Proposed division of responsibilities — confirmation required
+## 7. Performance-data integrity
 
-The allocation below is a **working proposal, not an agreed team decision**. It balances user-facing functional areas more evenly while recognizing that effort also includes backend, security, integration, and testing. **HY provisionally leads fulfillment tracking and supplier progress updates**, transferred from the earlier draft; both teammates should approve this change.
+The system can record events automatically, but **system-recorded does not mean independently verified**.
 
-| Work package | Proposed lead | Support / integration responsibility |
-| --- | --- | --- |
-| Repository structure, README coordination, navigation shell | **HY** | SY checks workflow/assignment consistency |
-| Contractor authentication, role authorization, project assignments | **HY** | SY supplies role and project-access test cases |
-| Company provider directory, basic CSV import, profiles, retro-ratings | **HY** | SY defines construction-resource fields |
-| Requirements, provider shortlisting, RFQ setup, invitations | **SY** | HY connects directory, project permissions, and IDs |
-| Restricted no-login supplier RFQ response and file submission | **SY** | HY reviews token/access design |
-| Comparison matrix, manual selection, committed dates | **SY** | HY provides shared provider/quotation data contracts |
-| **Fulfillment tracking, supplier progress updates, milestone persistence** | **HY** | SY supplies procurement/selection handoff and user acceptance scenarios |
-| Response-time metrics, completion evaluation, knowledge-reuse display | **SY** | HY supplies stored milestones, schedule-variance logic, and provider-history persistence |
-| End-to-end tests, security reviews, accessibility, integration demos | **Both** | Joint sign-off of each increment |
-| P1/P2 pages | **Both (to be assigned later)** | Re-estimate only after P0 validation |
+| Information | How it is obtained | Display / metric policy |
+|---|---|---|
+| RFQ invitation sent | Server timestamp | System-recorded timestamp |
+| RFQ link first opened | First valid server-side link access (optional) | Only an **access event**, not proof a human read the invitation; scanners may prefetch links |
+| Quotation submitted | Server timestamp | Report *invitation-to-submission elapsed time* rather than claiming observed human response latency |
+| Fulfillment date reported | Supplier submission or site-staff draft | Label **supplier-reported / unconfirmed** |
+| Actual fulfillment date confirmed | Authorized Project Manager verifies or corrects date | Only **PM-confirmed** actual dates enter confirmed schedule-deviation reporting |
+| Legacy retro-rating | Internal staff judgment during onboarding | Label **historical subjective assessment**; never present as measured performance |
 
-**Integration agreements before coding:** Agree on `companyId`, `projectId`, `providerId`, `rfqId`, `quotationId`, provider selection/commitment records, fulfillment milestones/statuses, token authorization rules, and where objective metrics are stored. Each module has one proposed lead; cross-module interfaces and reviews belong to both members.
+For confirmed records:
 
-## 8. Core user journey
+`Schedule deviation (days) = PM-confirmed actual fulfillment date − committed fulfillment date`
 
-1. **Company onboarding (HY):** The Company Administrator assigns users/projects; the Company Procurement Manager adds or imports existing providers, with clearly labeled historical ratings.
-2. **Project sourcing (SY):** Project Procurement Staff define needs, search the contractor's private provider network, shortlist candidates, and issue RFQs.
-3. **Supplier RFQ response (SY):** Individually invited providers use private, mobile-friendly links to submit quotations, availability, dates, and optional documents without creating accounts.
-4. **Decision support (SY):** Authorized project users review comparisons and available provider history; the Project Manager **manually** selects a provider and records commitments.
-5. **Fulfillment (HY):** Project staff monitor actual versus committed dates, with supplier updates allowed only through a properly scoped follow-up link or access path.
-6. **Evaluation and knowledge reuse (SY + HY):** System-generated timestamps and milestone variances plus the Project Manager's structured evaluation update company history for reuse by other authorized projects.
+Display metric **sample size (n)** and the underlying observations where feasible. As a provisional design threshold, label aggregate provider-level rates **“insufficient data” for n < 5**; this is **a proposed display rule, not a statistical guarantee**, and should be tested with users. Do not build composite supplier rankings in P0. Different resource categories and RFQ requirements should not be treated as statistically interchangeable.
 
-## 9. Incremental development roadmap
+## 8. Implementation strategy and ownership
 
-```mermaid
-flowchart LR
-    I1["1. Foundation & Onboarding<br/>HY"] --> I2["2. Requirements & Shortlist<br/>SY"]
-    I2 --> I3["3. RFQ & Supplier Response<br/>SY"]
-    I3 --> I4["4. Compare & Select<br/>SY"]
-    I4 --> I5["5. Fulfillment<br/>HY"]
-    I5 --> I6["6. Evaluation & Reuse<br/>SY + HY"]
-    classDef increment fill:#dcfce7,stroke:#15803d,color:#052e16;
-    class I1,I2,I3,I4,I5,I6 increment;
-```
+### Walking skeleton before feature expansion
 
-| Increment | Demo outcome | Proposed lead | Acceptance criteria |
-| --- | --- | --- | --- |
-| 1 — Foundation and onboarding | Authorized company/project setup; sample provider CSV imported | HY | AC-01, AC-02 |
-| 2 — Requirements and shortlist | Project team records a need and selects invited providers | SY | AC-03 (first half) |
-| 3 — RFQ and supplier response | Supplier returns a valid quote through an individually restricted link | SY | AC-03, AC-04 |
-| 4 — Comparison and selection | Project Manager reviews offers and records manual selection | SY | AC-05 |
-| 5 — Fulfillment | Authorized updates produce actual milestones and schedule evidence | HY | AC-06 |
-| 6 — Evaluation and reuse | Updated history is visible on a subsequent authorized project | SY + HY | AC-07, AC-08 |
+**First integration checkpoint:** One contractor → one project → one provider → one RFQ → one secure link → one structured quote → one manual selection. This validates authentication, cross-module identifiers, token scope, storage, and basic navigation **before** broadening the feature set. It is a **technical milestone**, not the complete MVP.
 
-**Development approach:** These are proposed increments, not fixed deadlines. Review each working increment with both teammates before expanding scope; re-plan if effort exceeds available time.
+### Provisional single-owner assignments
 
+| Work package / contract | Primary lead | Dependency / support |
+|---|---|---|
+| Repository setup, contractor authentication, RBAC, tenant/project authorization | **HY** | SY writes cross-role misuse tests |
+| Master provider database and provider IDs; fulfillment milestone model, persistence, PM confirmation page | **HY** | SY confirms fields used by sourcing/metrics |
+| RFQ, supplier links **including both RFQ and fulfillment token issuance/validation/revocation** | **SY** | HY integrates authentication and persistence; shared threat review |
+| Resource requirements, supplier quote page, category-aware comparison and award | **SY** | HY provides provider IDs and project access layer |
+| **Metrics calculation and data provenance policy** | **SY** | HY provides committed, reported and PM-confirmed dates |
+| Completion evaluation / history presentation | **SY** | HY persists company-owned provider history |
+| Integrated tests, accessibility/usability, README/diagram review | **Both** | Joint acceptance |
+
+**Interface agreement before coding:** Agree on identifiers (`company_id`, `project_id`, `provider_id`, `rfq_id`, `engagement_id`), authorization checks, quotation fields, link purposes, fulfillment status transitions, and which service owns each persisted value. SY owns the entire token lifecycle; HY owns fulfillment milestone persistence. No second, competing token implementation should be built in the fulfillment module.
+
+### Increments, rough effort, dependencies, and security gates
+
+*The estimates below are **relative team-effort ranges**, not promised calendar dates. Refine after repository setup and a working skeleton. Work may overlap once interfaces are agreed.*
+
+| Increment | Deliverable | Indicative effort | Blocks / dependencies | Acceptance/security gate |
+|---|---|---|---|---|
+| **0. Walking skeleton** | One RFQ-to-quote-to-selection journey | **Small–medium** | Shared IDs, minimal access and storage | Isolated RFQ token cannot access unrelated data |
+| **1. Foundation** | Auth, project scope, provider records | **Medium** | Base data model and role rules | Unauthorized company/project access fails (**AC-01**) |
+| **2. Sourcing** | Requirements, shortlist, invitations | **Small–medium** | Provider directory + project access | Wrong-role creation/reading is rejected |
+| **3. RFQ responses** | Secure mobile links, quote submission | **Medium–large** | Token service + RFQ model | **AC-04 / AC-08a** expiry, revocation, tenant isolation, confidentiality, upload validation |
+| **4. Compare and select** | Materials comparison; award; new fulfillment authorization | **Medium** | Structured responses + award permissions | Flag non-comparable bids; only authorized PM awards; separate token issued |
+| **5. Fulfillment/evaluation** | Supplier progress, PM confirmation, system-recorded metrics | **Medium** | HY milestone model + SY tokens/metrics | Unconfirmed dates excluded; supplier cannot edit approved dates |
+| **6. Reuse and integration** | Cross-project provider history and final end-to-end validation | **Small–medium** | All prior increments | **AC-08b** cross-project reuse respects permissions |
+
+**Cut line if time is limited (team/lecturer approval required):** Prioritize the walking skeleton, secure link separation, tenant isolation, one complete **materials** procurement journey, PM-confirmed data, and company-history reuse. Defer rich dashboards, the optional portal, advanced quote attachments, automated imports (using clearly marked demo records temporarily), and richer evaluation forms **before** dropping security or the core knowledge loop. Clearly state any departure from the source proposal's target Must-have scope in the final demonstration.
+
+### Explicit dependency summary
+
+| Dependency | Required collaboration |
+|---|---|
+| Project and provider identity → sourcing/RFQ | HY provides identifiers and authorization interface; SY consumes them |
+| RFQ/award → supplier token lifecycle | SY issues purpose-specific links and enforces scope |
+| Fulfillment report → confirmed outcome | HY persists reported and PM-confirmed states; SY computes metrics only from confirmed outcomes |
+| Metrics/evaluation → reusable provider history | SY defines metrics and evaluation payloads; HY owns storage; both test cross-project visibility |
+
+## 9. Testable acceptance criteria
+
+The following criteria are **planned tests**, not test results. AC numbers are local to this README and do not replace the proposal's user-story IDs.
+
+| ID | Acceptance criterion | Earliest gate |
+|---|---|---|
+| **AC-01** | A user assigned to Company A / Project A is denied server access to another company's data and unauthorized projects, even with manually altered URLs/IDs | Increment 1 |
+| **AC-02** | A provider can be linked to the correct company and shortlisted for an authorized project | Increment 2 |
+| **AC-03** | A supplier can submit a structured materials quotation without an account | Increment 3 |
+| **AC-04** | Expired, revoked, wrong-provider, wrong-purpose, and cross-tenant tokens all fail; a follow-up token cannot submit a new RFQ quotation | Increment 3 and retested in 4–5 |
+| **AC-05** | Missing units, mismatched specifications, or exclusions trigger a visible **not-directly-comparable** warning | Increment 4 |
+| **AC-06** | Only an authorized Project Manager can record a provider award and confirm fulfillment | Increment 4–5 |
+| **AC-07** | Supplier-reported dates do not appear as confirmed schedule-deviation evidence until PM confirmation; counts are displayed | Increment 5 |
+| **AC-08a** | During initial supplier response, RFQ A token cannot read RFQ B, competitor bids, contractor comments/ratings, or another company's data; negative cases run before Increment 3 acceptance | Increment 3 |
+| **AC-08b** | Authorized users can reuse company provider history across assigned projects without exposing unrelated company or project records | Increment 6 |
+| **AC-09** | The full materials demo can complete sourcing through updated company history, with each change audit-recorded | Increment 6 |
+
+## 10. Business and pilot validation
+
+**Customer hypothesis (not market research):** Taiwan-based small and medium contractors handling several simultaneous projects and using fragmented supplier records are the initial pilot audience. The source proposal provides **indicative** subscription tiers (Starter, Growth, Professional, Enterprise); those figures are **pricing hypotheses**, not customer-validated willingness to pay. This README does not claim verified competitor pricing or market share.
+
+**Substitutes to investigate:** Existing Excel/CSV files, phone/email/LINE communication, procurement features within ERP systems, and construction bid-management platforms. The team should interview contractor staff to learn which steps truly create duplication or delay before making comparative claims.
+
+**Pilot success measures (baselines and targets to be determined with pilot users):**
+
+- Time to prepare, send, collect, and compare one RFQ versus the contractor's current practice.
+- Supplier RFQ completion rate without account registration and invitation-to-submission elapsed time.
+- Number of imported/entered provider records actually reused in a second project.
+- Share of completed engagements with PM-confirmed fulfillment dates.
+- Contractor and supplier feedback on ease of use, including Traditional Chinese labels.
+
+**Validation action:** Observe or interview a small sample of relevant contractors and invited suppliers; demonstrate one materials case and record baseline/current versus prototype workflow effort. Do not present proposed metrics as measured outcomes.
+
+## 11. Assumptions, top risks, and non-goals
+
+**Assumptions:** The pilot contractor permits use of non-sensitive demo information; selected suppliers can open mobile links; one materials case adequately exercises the first integration; team responsibilities and any P0 deferrals will be confirmed together.
+
+| Risk | Mitigation |
+|---|---|
+| Link forwarding or token leakage | Scoped, revocable, time-limited server-validated bearer tokens; optional additional verification |
+| False or incomplete supplier progress reports | Separate supplier-reported and PM-confirmed statuses; audit trail |
+| Thin, subjective historical supplier information | Show source and `n`; avoid unsupported ranking; test actual day-one value |
+| Non-comparable prices across categories | Category-specific fields and comparability warnings; one fully verified materials demonstration |
+| Two-person capacity and coupled modules | Single owner per shared contract, early walking skeleton, approved cut line |
+| Personal data and named negative evaluations | Limited access, documented provenance and retention; seek qualified local review |
+
+**Non-goals for P0:** Public supplier discovery marketplace; automatic contract award; composite or AI-generated supplier rankings; payments/accounting/payroll; BIM; deep ERP integration; large scheduling system; and unrestricted supplier account access.
