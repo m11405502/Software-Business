@@ -1,6 +1,6 @@
 # Construction Supplier Collaboration & Decision-Support Platform
 
-Software Engineering in Construction Information Systems 
+Software Engineering in Construction Information Systems  
 **Project:** Web-Based Collaboration and Decision-Support for Construction Suppliers  
 **Team members:** Sesmiwati Binti Yusmadi Yusuf (SY) and Hsu, Yung-Tang (HY)  
 
