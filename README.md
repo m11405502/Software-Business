@@ -222,7 +222,7 @@ Display metric **sample size (n)** and the underlying observations where feasibl
 
 ## 9. Testable acceptance criteria
 
-The following criteria are **planned tests**, not test results. AC numbers are local to this README and do not replace the proposal's user-story IDs.
+**Acceptance Criteria**: The following criteria define the expected system behavior and will be used to verify whether the implemented features meet the specified requirements. They do not represent completed test results.
 
 | ID | Acceptance criterion | Earliest gate |
 |---|---|---|
