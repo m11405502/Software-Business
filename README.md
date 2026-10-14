@@ -209,7 +209,7 @@ Display metric **sample size (n)** and the underlying observations where feasibl
 | **5. Fulfillment/evaluation** | Supplier progress, PM confirmation, system-recorded metrics | **Medium** | HY milestone model + SY tokens/metrics | Unconfirmed dates excluded; supplier cannot edit approved dates |
 | **6. Reuse and integration** | Cross-project provider history and final end-to-end validation | **Small–medium** | All prior increments | **AC-08b** cross-project reuse respects permissions |
 
-**Cut line if time is limited (team/lecturer approval required):** Prioritize the walking skeleton, secure link separation, tenant isolation, one complete **materials** procurement journey, PM-confirmed data, and company-history reuse. Defer rich dashboards, the optional portal, advanced quote attachments, automated imports (using clearly marked demo records temporarily), and richer evaluation forms **before** dropping security or the core knowledge loop. Clearly state any departure from the source proposal's target Must-have scope in the final demonstration.
+**MVP Implementation Scope**: The initial implementation prioritizes secure supplier collaboration, procurement workflows, fulfillment verification, and company-level supplier performance records. The platform is designed to support construction materials, subcontractors/labor services, and equipment providers. Advanced features may be implemented in later development phases.
 
 ### Explicit dependency summary
 
