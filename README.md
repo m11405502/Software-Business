@@ -117,8 +117,6 @@ All categories share: provider identity, RFQ/requirement ID, quoted amount and c
 
 ## 5. Verified user-story traceability
 
-Identifiers below are checked directly against the primary user stories in Section 11.1 of the September 2026 proposal to ensure accurate functional mapping.
-
 | Website page / feature | Source user stories (Section 11.1) | Priority / note | Lead |
 |---|---|---|---|
 | Company sign-in, roles, permissions | **CA-02** | P0 | HY |
