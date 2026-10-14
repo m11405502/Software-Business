@@ -38,7 +38,7 @@ Diagrams show **web pages or entry points**, not the database or background calc
 flowchart TB
     ROOT["Contractor Website [Both]"] --> LOGIN["Sign-in [HY]"]
     LOGIN --> CO["Company Workspace"]
-    LOGIN --> PR["Assigned Project Workspace"]
+    LOGIN --> PR["Assigned Project Dashboard"]
 
     CO --> ACCESS["Users and Roles [HY]"]
     CO --> ASSIGN["Projects and Team Assignments [HY]"]
@@ -48,19 +48,17 @@ flowchart TB
     CO --> LABELS["Provider Status Labels [HY]"]
     CO --> DASH["Cross-Project Dashboard [Both]"]
 
-    PR --> REQ["Resource Requirement [SY]"]
-    PR --> SHORT["Search and Shortlist [SY]"]
-    PR --> RFQ["RFQ Creation and Invitations [SY]"]
-    PR --> CMP["Category-Aware Quote Comparison [SY]"]
-    PR --> AWARD["Select Provider and Commitments [SY]"]
-    PR --> TRACK["Fulfillment and PM Confirmation [HY]"]
-    PR --> EVAL["Completion Evaluation [SY]"]
+    PR --> PIPELINE["Single Project Pipeline View<br/>(Sequential Stepper) [SY & HY]"]
+    PIPELINE -.-> STEP1["Stage 1: RFQ & Invitations [SY]"]
+    PIPELINE -.-> STEP2["Stage 2: Quote Comparison & Award [SY]"]
+    PIPELINE -.-> STEP3["Stage 3: Fulfillment Tracking & Eval [HY]"]
 
     classDef nav fill:#dbeafe,stroke:#2563eb,color:#0f172a;
     classDef p0 fill:#dcfce7,stroke:#15803d,color:#052e16;
     classDef p1 fill:#fef3c7,stroke:#b45309,color:#422006;
-    class ROOT,CO,PR nav;
-    class LOGIN,ACCESS,ASSIGN,DIR,PROFILE,IMPORT,REQ,SHORT,RFQ,CMP,AWARD,TRACK,EVAL p0;
+    
+    class ROOT,CO,PR,PIPELINE nav;
+    class LOGIN,ACCESS,ASSIGN,DIR,PROFILE,IMPORT,STEP1,STEP2,STEP3 p0;
     class LABELS,DASH p1;
 ```
 
@@ -70,12 +68,12 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    RFQISSUE["Contractor Issues RFQ [SY]"] --> TOKEN1["RFQ Response Link [SY]"]
+    RFQISSUE["Secure SMS/LINE Message Entry [SY]"] --> TOKEN1["RFQ Response Link [SY]"]
     TOKEN1 --> VIEW["View Invited RFQ [SY]"]
     VIEW --> REPLY["Enter Quote and Availability [SY]"]
     REPLY --> SEND["Submit RFQ Response [SY]"]
 
-    AWARD["Contractor Selects Provider [SY]"] -.->|"New scoped token after award"| TOKEN2["Post-Award Fulfillment Link [SY]"]
+    AWARD["Post-Award Notification Link [SY]"] -.->|"New scoped token after award"| TOKEN2["Post-Award Fulfillment Link [SY]"]
     TOKEN2 --> UPD["Report Fulfillment Progress [HY]"]
     UPD --> CONFIRM["PM Reviews Report [HY]"]
 
@@ -86,6 +84,7 @@ flowchart TB
     classDef p0 fill:#dcfce7,stroke:#15803d,color:#052e16;
     classDef p1 fill:#fef3c7,stroke:#b45309,color:#422006;
     classDef p2 fill:#e5e7eb,stroke:#6b7280,color:#111827;
+    
     class RFQISSUE,AWARD nav;
     class TOKEN1,VIEW,REPLY,SEND,TOKEN2,UPD,CONFIRM p0;
     class PORTAL,BASIC p1;
@@ -118,7 +117,7 @@ All categories share: provider identity, RFQ/requirement ID, quoted amount and c
 
 ## 5. Verified user-story traceability
 
-Identifiers below are checked against **Section 11.1** of the September 2026 proposal, **not** its inconsistent Section 13 traceability table. This table refers to planned functions; a story may span multiple pages. *System requirements* SR-01–SR-04 in Section 11.2 are tracked separately, and SR-01/SR-02 concern metrics rather than security despite that section's heading.
+Identifiers below are checked directly against the primary user stories in Section 11.1 of the September 2026 proposal to ensure accurate functional mapping.
 
 | Website page / feature | Source user stories (Section 11.1) | Priority / note | Lead |
 |---|---|---|---|
