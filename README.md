@@ -154,7 +154,7 @@ All categories share: provider identity, RFQ/requirement ID, quoted amount and c
 
 **Personal and commercial data:** Supplier contact information and performance evaluations will be accessible only to authorized users. The system will include access controls, audit logs, and data retention policies. Compliance with applicable Taiwanese data-protection regulations must be verified before real-world deployment.
 
-**Interface language (planning assumption):** Traditional Chinese first for Taiwan-based contractor and supplier workflows; English labels/help may be added when practical. Confirm language preferences during pilot interviews.
+**Interface language (planning assumption):** Interface Language (Planning Assumption): The platform is planned to support both Traditional Chinese and English to accommodate Taiwan-based contractors, suppliers, and international users. Users will be able to select their preferred interface language. Language preferences and translation requirements will be validated during pilot interviews.
 
 ## 7. Performance-data integrity
 
