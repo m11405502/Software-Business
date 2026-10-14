@@ -197,7 +197,7 @@ Display metric **sample size (n)** and the underlying observations where feasibl
 
 ### Increments, rough effort, dependencies, and security gates
 
-*The estimates below are **relative team-effort ranges**, not promised calendar dates. Refine after repository setup and a working skeleton. Work may overlap once interfaces are agreed.*
+*The following estimates represent approximate development effort rather than fixed deadlines. They may be adjusted based on project progress, and some activities may be carried out concurrently.*
 
 | Increment | Deliverable | Indicative effort | Blocks / dependencies | Acceptance/security gate |
 |---|---|---|---|---|
