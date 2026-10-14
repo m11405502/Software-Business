@@ -239,19 +239,25 @@ Display metric **sample size (n)** and the underlying observations where feasibl
 
 ## 10. Business and pilot validation
 
-**Customer hypothesis (not market research):** Taiwan-based small and medium contractors handling several simultaneous projects and using fragmented supplier records are the initial pilot audience. The source proposal provides **indicative** subscription tiers (Starter, Growth, Professional, Enterprise); those figures are **pricing hypotheses**, not customer-validated willingness to pay. This README does not claim verified competitor pricing or market share.
+**Target Customers**: The platform primarily targets small- and medium-sized construction contractors in Taiwan who manage multiple projects and rely on fragmented supplier information across spreadsheets, phone calls, email, and LINE.
 
-**Substitutes to investigate:** Existing Excel/CSV files, phone/email/LINE communication, procurement features within ERP systems, and construction bid-management platforms. The team should interview contractor staff to learn which steps truly create duplication or delay before making comparative claims.
+**Business Model**: The platform adopts a subscription-based Software-as-a-Service (SaaS) model for construction contractors, with four proposed subscription tiers: **Starter, Growth, Professional, and Enterprise**. Subscription levels are intended to accommodate different company sizes and operational requirements. Suppliers and service providers can participate in core collaboration workflows free of charge. Pricing and tier-specific features will be validated through customer feedback before commercial deployment.
 
-**Pilot success measures (baselines and targets to be determined with pilot users):**
+**Pilot Validation**: Initial testing will focus on evaluating the platform's usability and effectiveness in supporting procurement workflows, supplier collaboration, and company-level information sharing. Key evaluation areas include:
 
-- Time to prepare, send, collect, and compare one RFQ versus the contractor's current practice.
-- Supplier RFQ completion rate without account registration and invitation-to-submission elapsed time.
-- Number of imported/entered provider records actually reused in a second project.
-- Share of completed engagements with PM-confirmed fulfillment dates.
-- Contractor and supplier feedback on ease of use, including Traditional Chinese labels.
+Efficiency of RFQ preparation, submission, and quotation comparison.
 
-**Validation action:** Observe or interview a small sample of relevant contractors and invited suppliers; demonstrate one materials case and record baseline/current versus prototype workflow effort. Do not present proposed metrics as measured outcomes.
+Supplier participation through secure links without mandatory account registration.
+
+Reuse of supplier information and performance records across projects.
+
+Accuracy and verification of fulfillment records.
+
+User feedback on system usability, including Traditional Chinese and English interfaces.
+
+The initial pilot may demonstrate a complete construction-material procurement workflow while maintaining the platform's broader scope covering subcontractors/labor services and equipment providers.
+
+These evaluation criteria represent planned validation activities rather than confirmed performance results.
 
 ## 11. Assumptions, top risks, and non-goals
 
