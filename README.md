@@ -48,7 +48,7 @@ flowchart TB
     CO --> LABELS["Provider Status Labels [HY]"]
     CO --> DASH["Cross-Project Dashboard [Both]"]
 
-    PR --> PIPELINE["Single Project Pipeline View<br/>(Sequential Stepper) [SY & HY]"]
+    PR --> PIPELINE["Single Project Pipeline View<br/>(Sequential Stepper) [Both]"]
     PIPELINE -.-> STEP1["Stage 1: RFQ & Invitations [SY]"]
     PIPELINE -.-> STEP2["Stage 2: Quote Comparison & Award [SY]"]
     PIPELINE -.-> STEP3["Stage 3: Fulfillment Tracking & Eval [HY]"]
