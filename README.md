@@ -152,7 +152,7 @@ All categories share: provider identity, RFQ/requirement ID, quoted amount and c
 6. Consider an out-of-band one-time code for fulfillment updates if usability and threat assessment justify it; it is not assumed in initial P0 scope. Forwarded bearer links remain a risk even when tokens are unguessable.
 7. Validate and limit uploads (type, size, storage access); sanitize displayed content. Supplier users must never view competing quotes, private ratings, or unrelated projects.
 
-**Personal and commercial data:** Supplier contact details and named evaluations should be collected only as needed, access-restricted, auditable, and subject to a retention/deletion policy. Confirm applicable Taiwan data-protection requirements with qualified guidance before deploying real customer data; this README does **not** claim legal compliance.
+**Personal and commercial data:** Supplier contact information and performance evaluations will be accessible only to authorized users. The system will include access controls, audit logs, and data retention policies. Compliance with applicable Taiwanese data-protection regulations must be verified before real-world deployment.
 
 **Interface language (planning assumption):** Traditional Chinese first for Taiwan-based contractor and supplier workflows; English labels/help may be added when practical. Confirm language preferences during pilot interviews.
 
