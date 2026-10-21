@@ -99,6 +99,8 @@ flowchart TB
 
 ## 4. MVP scope and quotation comparison
 
+**Delivery boundary:** **P0 = MVP commitment**; **P1 and P2 = additions for the envisioned full product**. The first working demonstration does not need full-product-only pages. The full-product roadmap encompasses the MVP, rather than replacing it.
+
 | Priority | Planned functionality | Test of completion |
 |---|---|---|
 | **P0 — Must-have** | Company/project access; provider directory for **all three categories**; initial provider records and simple retro-ratings; requirements, shortlist, RFQ, secure mobile response; manual selection; fulfillment reporting and PM confirmation; basic completion evaluation; system-recorded metrics and company history reuse | Demonstrate a complete requirement-to-reuse journey. **First detailed end-to-end example: materials.** |
@@ -118,6 +120,7 @@ All categories share: provider identity, RFQ/requirement ID, quoted amount and c
 | Equipment — subsequent template | Equipment type/capacity, rental unit/duration, operator inclusion, mobilization cost | Same equipment requirement, rental basis, and included services |
 
 **Comparison behavior:** Highlight missing fields or inconsistent units/scope as **“not directly comparable.”** Do not rank by raw price alone; display evidence and leave selection to the authorized Project Manager. Supporting quote files can be deferred from an initial working skeleton if a safe structured-text response is available; final P0 file-upload scope remains subject to scheduling and safe-upload tests.
+
 
 ## 5. Verified user-story traceability
 
