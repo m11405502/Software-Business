@@ -124,28 +124,33 @@ All categories share: provider identity, RFQ/requirement ID, quoted amount and c
 
 ## 5. Verified user-story traceability
 
-| Website page / feature | Source user stories (Section 11.1) | Priority / note | Lead |
-|---|---|---|---|
-| Company sign-in, roles, permissions | **CA-02** | P0 | HY |
-| Project creation and team assignments | **CA-03** | P0 | HY |
-| Company subscription/account administration | **CA-01** | Later commercial scope | HY (proposed) |
-| Provider directory, company provider record | **CPM-01** | P0 | HY |
-| Provider import and historical tags | **CPM-02** | P0 target; manual-entry fallback requires approval | HY |
-| Invite or onboard provider | **CPM-03** | P0, through RFQ invitations/basic provider registration | SY + HY |
-| Cross-project performance dashboard | **CPM-04** | P1 dashboard; underlying provider history is P0 | Both |
-| Requirement creation and shortlist | **PPS-01, PPS-02** | P0 | SY |
-| RFQ issue and secure response-link generation | **PPS-03, PPS-04** | P0 | SY |
-| Automatic comparison matrix | **PPS-05** | P0 (materials fully demonstrated) | SY |
-| Review proposals against history and select provider | **PM-01** | P0 | SY |
-| Committed dates and fulfillment tracking | **PM-02** | P0 | HY + SY |
-| Post-completion evaluation | **PM-03** | P0 short form | SY |
-| Delayed-response and delivery alerts | **PM-04** | Deferred; not a standalone P0 page | To assign |
-| View RFQ from no-login link | **SUP-01** | P0 | SY |
-| Upload/submit quote and availability | **SUP-02** | P0 target; safe file upload may be staged | SY |
-| Report progress through **separate** post-award link | **SUP-03** | P0 | HY (page); SY (token) |
-| Optional full self-managed profile | **SUP-04** | P2 full profile; P1 portal is a smaller, **related** future capability, not fulfillment of SUP-04 | Both |
+The source-proposal user stories are classified below as **MVP (P0)** or **full-product additions (P1/P2)**. This is a **planned scope assignment**, not a claim that any use case has already been implemented. For mixed use cases, the **P0 baseline** and **P1 enhancement** are named separately.
 
-**Nonfunctional/system requirements:** **SR-01** = response metrics, **SR-02** = schedule variance, **SR-03** = commercial confidentiality, **SR-04** = internal evaluation confidentiality. Every P0 integration must preserve SR-03 and SR-04.
+| Website page / use case | Source proposal user story (§11.1) | Scope tag and boundary | Lead |
+|---|---|---|---|
+| Company sign-in, roles, permissions | **CA-02** | 🟩 **MVP · P0** | HY |
+| Project creation and team assignments | **CA-03** | 🟩 **MVP · P0** | HY |
+| Company subscription/account administration | **CA-01** | ⬜ **FULL · P2** — later commercial administration; not needed for MVP demonstration | HY (proposed) |
+| Provider directory and company-owned history | **CPM-01** | 🟩 **MVP · P0** | HY |
+| Initial provider import and historical tags | **CPM-02** | 🟩 **MVP · P0 target** — any manual-entry substitution needs approval | HY |
+| Invite/onboard providers | **CPM-03** | 🟩 **MVP · P0:** direct RFQ invitation without supplier account; 🟨 **FULL · P1:** optional portal-based onboarding | SY + HY |
+| Cross-project performance dashboard | **CPM-04** | 🟨 **FULL · P1** dashboard; storing and reusing provider history remains 🟩 **MVP · P0** | Both |
+| Requirement creation and provider shortlist | **PPS-01, PPS-02** | 🟩 **MVP · P0** | SY |
+| Issue RFQ and generate secure response link | **PPS-03, PPS-04** | 🟩 **MVP · P0** | SY |
+| Automatic quotation comparison matrix | **PPS-05** | 🟩 **MVP · P0:** complete materials example; 🟨 **FULL · P1:** expanded category-specific templates | SY |
+| Review proposals against history and select provider manually | **PM-01** | 🟩 **MVP · P0** | SY |
+| Record commitments, track fulfillment, and confirm dates | **PM-02** | 🟩 **MVP · P0** | HY + SY |
+| Post-completion evaluation | **PM-03** | 🟩 **MVP · P0** short form | SY |
+| Delayed-response and delivery alerts | **PM-04** | 🟨 **FULL · P1 (proposed)** — deferred beyond MVP; owner not yet assigned | To assign |
+| View RFQ through passwordless link | **SUP-01** | 🟩 **MVP · P0** | SY |
+| Submit quotation and availability | **SUP-02** | 🟩 **MVP · P0** structured response; safe file upload is a P0 target that may be staged | SY |
+| Report progress through separate post-award link | **SUP-03** | 🟩 **MVP · P0** | HY (page); SY (token) |
+| Full self-managed supplier profile and certificates | **SUP-04** | ⬜ **FULL · P2**; the smaller P1 portal does not complete this story | Both |
+
+**System requirements across MVP features:** **SR-01** = response metrics; **SR-02** = confirmed schedule deviation; **SR-03** = commercial confidentiality; **SR-04** = internal evaluation confidentiality. These are **not optional full-product extras**. Every P0 integration must preserve SR-03 and SR-04.
+
+**Beyond the traced stories:** Other P2 ideas from Section 4 (such as predictive analytics or ERP/API integrations) remain **future product concepts**, not verified user-story IDs or MVP commitments. Any full-product feature without an agreed user story requires later requirements validation.
+
 
 ## 6. Secure link lifecycle and data protection
 
