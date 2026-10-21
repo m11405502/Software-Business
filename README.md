@@ -35,7 +35,7 @@ Diagrams show **web pages or entry points**, not the database or background calc
 ### 3.1 Internal contractor website
 
 ```mermaid
-lowchart TB
+flowchart TB
     ROOT["Contractor Website<br/>Navigation"] --> LOGIN["Sign-in<br/>MVP · P0 · HY"]
     LOGIN --> CO["Company Workspace<br/>Navigation / role-restricted"]
     LOGIN --> PR["Assigned Project Dashboard<br/>Navigation / role-restricted"]
