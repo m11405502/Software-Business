@@ -35,34 +35,38 @@ Diagrams show **web pages or entry points**, not the database or background calc
 ### 3.1 Internal contractor website
 
 ```mermaid
-flowchart TB
-    ROOT["Contractor Website [Both]"] --> LOGIN["Sign-in [HY]"]
-    LOGIN --> CO["Company Workspace"]
-    LOGIN --> PR["Assigned Project Dashboard"]
+lowchart TB
+    ROOT["Contractor Website<br/>Navigation"] --> LOGIN["Sign-in<br/>MVP · P0 · HY"]
+    LOGIN --> CO["Company Workspace<br/>Navigation / role-restricted"]
+    LOGIN --> PR["Assigned Project Dashboard<br/>Navigation / role-restricted"]
 
-    CO --> ACCESS["Users and Roles [HY]"]
-    CO --> ASSIGN["Projects and Team Assignments [HY]"]
-    CO --> DIR["Provider Directory [HY]"]
-    DIR --> PROFILE["Provider Profile and History [HY]"]
-    DIR --> IMPORT["Import and Retro-Ratings [HY]"]
-    CO --> LABELS["Provider Status Labels [HY]"]
-    CO --> DASH["Cross-Project Dashboard [Both]"]
+    CO --> ACCESS["Users and Roles<br/>MVP · P0 · HY"]
+    CO --> ASSIGN["Projects and Team Assignments<br/>MVP · P0 · HY"]
+    CO --> DIR["Provider Directory<br/>MVP · P0 · HY"]
+    DIR --> PROFILE["Provider Profile and History<br/>MVP · P0 · HY"]
+    DIR --> IMPORT["Initial Import and Retro-Ratings<br/>MVP · P0 target · HY"]
+    CO --> LABELS["Provider Status Labels<br/>FULL · P1 · HY"]
+    CO --> DASH["Cross-Project Dashboard<br/>FULL · P1 · Both"]
+    CO --> SUBS["Subscription / Account Administration<br/>FULL · P2 · HY (proposed)"]
 
-    PR --> PIPELINE["Single Project Pipeline View<br/>(Sequential Stepper) [Both]"]
-    PIPELINE -.-> STEP1["Stage 1: RFQ & Invitations [SY]"]
-    PIPELINE -.-> STEP2["Stage 2: Quote Comparison & Award [SY]"]
-    PIPELINE -.-> STEP3["Stage 3: Fulfillment Tracking & Eval [HY]"]
+    PR --> PIPELINE["Single Project Procurement Pipeline<br/>Navigation / sequential stepper"]
+    PIPELINE -.-> STEP1["Stage 1: Requirements, RFQs & Invitations<br/>MVP · P0 · SY"]
+    PIPELINE -.-> STEP2["Stage 2: Quote Comparison & Award<br/>MVP · P0 · SY"]
+    PIPELINE -.-> STEP3["Stage 3: Fulfillment & Evaluation<br/>MVP · P0 · HY + SY"]
+    PIPELINE -.-> ALERT["Response / Delivery Alerts<br/>FULL · P1 · owner TBD"]
 
     classDef nav fill:#dbeafe,stroke:#2563eb,color:#0f172a;
     classDef p0 fill:#dcfce7,stroke:#15803d,color:#052e16;
     classDef p1 fill:#fef3c7,stroke:#b45309,color:#422006;
-    
+    classDef p2 fill:#e5e7eb,stroke:#6b7280,color:#111827;
+
     class ROOT,CO,PR,PIPELINE nav;
     class LOGIN,ACCESS,ASSIGN,DIR,PROFILE,IMPORT,STEP1,STEP2,STEP3 p0;
-    class LABELS,DASH p1;
+    class LABELS,DASH,ALERT p1;
+    class SUBS p2;
 ```
 
-**Interpretation:** The login diagram expresses possible navigation, **not** universal access to both workspaces. Authorization decides which pages each user can use. Calculations such as response timing and schedule deviation occur behind these pages; they are not separate website pages.
+**Interpretation:** These connections show possible navigation, **not** permission for every signed-in user to enter every workspace. Company/project authorization is checked on the server. Stage 3 is jointly integrated: **HY** owns the fulfillment milestone/PM confirmation page, while **SY** owns evaluation, metrics, and supplier-link tokens. Response-time and schedule-deviation calculations run behind the pages, not as separate pages. **P0 import is a target**, with a manual-entry fallback only if explicitly approved (Section 4).
 
 ### 3.2 External supplier access (separate authorization paths)
 
