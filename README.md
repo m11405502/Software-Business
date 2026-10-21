@@ -72,30 +72,30 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    RFQISSUE["Secure SMS/LINE Message Entry [SY]"] --> TOKEN1["RFQ Response Link [SY]"]
-    TOKEN1 --> VIEW["View Invited RFQ [SY]"]
-    VIEW --> REPLY["Enter Quote and Availability [SY]"]
-    REPLY --> SEND["Submit RFQ Response [SY]"]
+    RFQISSUE["RFQ Invitation via SMS / LINE<br/>Navigation / delivery channel"] --> TOKEN1["RFQ Response Link<br/>MVP · P0 · SY"]
+    TOKEN1 --> VIEW["View Invited RFQ<br/>MVP · P0 · SY"]
+    VIEW --> REPLY["Enter Quote and Availability<br/>MVP · P0 · SY"]
+    REPLY --> SEND["Submit RFQ Response<br/>MVP · P0 · SY"]
 
-    AWARD["Post-Award Notification Link [SY]"] -.->|"New scoped token after award"| TOKEN2["Post-Award Fulfillment Link [SY]"]
-    TOKEN2 --> UPD["Report Fulfillment Progress [HY]"]
-    UPD --> CONFIRM["PM Reviews Report [HY]"]
+    AWARD["Post-Award Notification<br/>Navigation / selected provider only"] -.->|"New scoped token after award"| TOKEN2["Post-Award Fulfillment Link<br/>MVP · P0 · SY"]
+    TOKEN2 --> UPD["Report Fulfillment Progress<br/>MVP · P0 · HY"]
+    UPD -.-> CONFIRM["PM Confirms Report (internal)<br/>MVP · P0 · HY"]
 
-    PORTAL["Optional Supplier Portal [Both]"] --> BASIC["Basic Self-Service [Both]"]
-    BASIC --> FULL["Full Profiles and Certificates [Both]"]
+    PORTAL["Optional Supplier Portal<br/>FULL · P1 · Both"] --> BASIC["Basic Self-Service<br/>FULL · P1 · Both"]
+    BASIC --> FULL["Full Profiles and Certificates<br/>FULL · P2 · Both"]
 
     classDef nav fill:#dbeafe,stroke:#2563eb,color:#0f172a;
     classDef p0 fill:#dcfce7,stroke:#15803d,color:#052e16;
     classDef p1 fill:#fef3c7,stroke:#b45309,color:#422006;
     classDef p2 fill:#e5e7eb,stroke:#6b7280,color:#111827;
-    
+
     class RFQISSUE,AWARD nav;
     class TOKEN1,VIEW,REPLY,SEND,TOKEN2,UPD,CONFIRM p0;
     class PORTAL,BASIC p1;
     class FULL p2;
 ```
 
-**Important:** The post-award link is **not a continuation of RFQ-link permission**. Awarding a provider triggers issuance of a separate permission for that awarded engagement. Unselected providers never receive fulfillment-update access. The optional portal is not necessary for no-login P0 participation.
+**Important:** The post-award link is **not** a continuation of RFQ-link permission. Awarding a provider triggers a **new, separately scoped token** only for the selected provider and engagement. An unselected provider cannot submit fulfillment updates. The **PM confirmation** step is an *internal contractor action*, not supplier access. Basic no-login participation is **MVP · P0**, whereas a supplier account/portal belongs only to the **full-product extension**. Showing SMS/LINE as communication channels does not imply a P0 LINE-bot integration.
 
 ## 4. MVP scope and quotation comparison
 
