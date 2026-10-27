@@ -133,15 +133,15 @@ The source-proposal user stories are classified below as **MVP (P0)** or **full-
 | Company subscription/account administration | **CA-01** | ⬜ **FULL · P2** — later commercial administration; not needed for MVP demonstration | HY (proposed) |
 | Provider directory and company-owned history | **CPM-01** | 🟩 **MVP · P0** | HY |
 | Initial provider import and historical tags | **CPM-02** | 🟩 **MVP · P0 target** — any manual-entry substitution needs approval | HY |
-| Invite/onboard providers | **CPM-03** | 🟩 **MVP · P0:** direct RFQ invitation without supplier account; 🟨 **FULL · P1:** optional portal-based onboarding | SY + HY |
+| Invite/onboard providers | **CPM-03** | 🟩 **MVP · P0:** direct RFQ invitation without supplier account; 🟨 **FULL · P1:** optional portal-based onboarding | Both |
 | Cross-project performance dashboard | **CPM-04** | 🟨 **FULL · P1** dashboard; storing and reusing provider history remains 🟩 **MVP · P0** | Both |
 | Requirement creation and provider shortlist | **PPS-01, PPS-02** | 🟩 **MVP · P0** | SY |
 | Issue RFQ and generate secure response link | **PPS-03, PPS-04** | 🟩 **MVP · P0** | SY |
 | Automatic quotation comparison matrix | **PPS-05** | 🟩 **MVP · P0:** complete materials example; 🟨 **FULL · P1:** expanded category-specific templates | SY |
 | Review proposals against history and select provider manually | **PM-01** | 🟩 **MVP · P0** | SY |
-| Record commitments, track fulfillment, and confirm dates | **PM-02** | 🟩 **MVP · P0** | HY + SY |
+| Record commitments, track fulfillment, and confirm dates | **PM-02** | 🟩 **MVP · P0** | Both |
 | Post-completion evaluation | **PM-03** | 🟩 **MVP · P0** short form | SY |
-| Delayed-response and delivery alerts | **PM-04** | 🟨 **FULL · P1 (proposed)** — deferred beyond MVP; owner not yet assigned | To assign |
+| Delayed-response and delivery alerts | **PM-04** | 🟨 **FULL · P1 (proposed)** — deferred beyond MVP; | HY |
 | View RFQ through passwordless link | **SUP-01** | 🟩 **MVP · P0** | SY |
 | Submit quotation and availability | **SUP-02** | 🟩 **MVP · P0** structured response; safe file upload is a P0 target that may be staged | SY |
 | Report progress through separate post-award link | **SUP-03** | 🟩 **MVP · P0** | HY (page); SY (token) |
