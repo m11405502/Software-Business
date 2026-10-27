@@ -466,7 +466,7 @@ erDiagram
 Per-provider aggregate dashboards should show eligible-observation count `n` and filter by contractor, resource category, and source type. The README's `n < 5` warning is a **provisional display rule**, not a statistical guarantee.
 
 
-**Open award-rule decision:** The cardinality `QUOTATIONS ||--o| ENGAGEMENTS` shown here follows the previous business-rule review recommendation of no more than one engagement per quotation revision, **pending team approval**. The separate rule of at most one *active* engagement per RFQ is enforced transactionally and is not fully expressible in this diagram. PM acceptance of intermediate progress must not require a final completion date; the existing field `confirmed_actual_date` is nullable until a true completion is confirmed.
+**Award-rule decision:** The cardinality `QUOTATIONS ||--o| ENGAGEMENTS` has been confirmed and adopted by the team, enforcing a maximum of one engagement per quotation revision. The separate rule of at most one *active* engagement per RFQ is enforced transactionally and is not fully expressible in this diagram. PM acceptance of intermediate progress must not require a final completion date; the existing field `confirmed_actual_date` is nullable until a true completion is confirmed.
 
 
 ## 5. ER diagram D — Full-product extensions (P1 and P2)
