@@ -1,0 +1,103 @@
+
+<h1>Supplier Details</h1>
+
+<a href="/suppliers" class="btn btn-outline-secondary mb-4">
+  Back to Supplier Registry
+</a>
+
+<a href="/suppliers/{{provider.provider_id}}/edit"
+   class="btn btn-primary mb-4 ms-2">
+  Edit Supplier
+</a>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h4 class="mb-0">{{provider.provider_name}}</h4>
+  </div>
+
+  <div class="card-body">
+    <h5>Company Information</h5>
+
+    <p><strong>Location:</strong>
+      {{provider.city_or_county}}
+    </p>
+
+    <p><strong>Address:</strong>
+      {{provider.address}}
+    </p>
+
+    <p><strong>Company Phone:</strong>
+      {{provider.contact_phone}}
+    </p>
+
+    <p><strong>Company Email:</strong>
+      {{provider.contact_email}}
+    </p>
+
+    <h5 class="mt-4">Supplier Categories</h5>
+    {{#each categories}}
+      <span class="badge bg-primary me-2">
+        {{category_name}}
+      </span>
+    {{else}}
+      <p>No categories assigned.</p>
+    {{/each}}
+  </div>
+</div>
+
+<h4>Contact Persons</h4>
+
+{{#each contacts}}
+<div class="card mb-3">
+  <div class="card-body">
+
+    <h5>
+      {{contact_name}}
+      {{#if is_primary}}
+        <span class="badge bg-success">
+          Primary Contact
+        </span>
+      {{/if}}
+    </h5>
+
+    <p><strong>Position:</strong>
+      {{position_title}}
+    </p>
+
+    <p><strong>Phone:</strong>
+      {{contact_phone}}
+    </p>
+
+    <p><strong>Email:</strong>
+      {{contact_email}}
+    </p>
+
+    <p><strong>LINE ID:</strong>
+      {{#if line_id}}
+        {{line_id}}
+      {{else}}
+        Not provided
+      {{/if}}
+    </p>
+
+  </div>
+</div>
+{{else}}
+<p>No contact persons registered.</p>
+{{/each}}
+
+<hr class="my-4">
+
+<div class="d-flex justify-content-end">
+
+  <form action="/suppliers/{{provider.provider_id}}/delete"
+        method="POST"
+        onsubmit="return confirm('Are you sure you want to delete this supplier? This action cannot be undone.');">
+
+    <button type="submit" class="btn btn-outline-danger">
+      Delete Supplier
+    </button>
+
+  </form>
+
+</div>

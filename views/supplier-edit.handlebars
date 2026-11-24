@@ -1,0 +1,283 @@
+
+<h1>Edit Supplier</h1>
+<p class="text-muted">
+  Update supplier information for Demo Contractor.
+</p>
+
+<form action="/suppliers/{{provider.provider_id}}/update"
+      method="POST" id="edit-supplier-form">
+
+  <h4>1. Company Information</h4>
+
+  <div class="mb-3">
+    <label class="form-label">Supplier Company Name *</label>
+    <input type="text" name="provider_name"
+           class="form-control"
+           value="{{provider.provider_name}}"
+           maxlength="255" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Supplier Categories *</label>
+
+    {{#each categories}}
+    <div class="form-check">
+      <input class="form-check-input"
+             type="checkbox"
+             name="category_ids"
+             value="{{category_id}}"
+             id="category-{{category_id}}"
+             {{#if selected}}checked{{/if}}>
+      <label class="form-check-label"
+             for="category-{{category_id}}">
+        {{category_name}}
+      </label>
+    </div>
+    {{/each}}
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">City / County</label>
+    <input type="text" name="city_or_county"
+           class="form-control"
+           list="taiwan-cities"
+           value="{{provider.city_or_county}}"
+           maxlength="100">
+    <datalist id="taiwan-cities">
+      <option value="Taipei City">
+      <option value="New Taipei City">
+      <option value="Taoyuan City">
+      <option value="Taichung City">
+      <option value="Tainan City">
+      <option value="Kaohsiung City">
+      <option value="Keelung City">
+      <option value="Hsinchu City">
+      <option value="Hsinchu County">
+      <option value="Miaoli County">
+      <option value="Changhua County">
+      <option value="Nantou County">
+      <option value="Yunlin County">
+      <option value="Chiayi City">
+      <option value="Chiayi County">
+      <option value="Pingtung County">
+      <option value="Yilan County">
+      <option value="Hualien County">
+      <option value="Taitung County">
+      <option value="Penghu County">
+      <option value="Kinmen County">
+      <option value="Lienchiang County">
+    </datalist>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Company Address</label>
+    <input type="text" name="address"
+           class="form-control"
+           value="{{provider.address}}"
+           maxlength="500">
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Company Phone</label>
+      <input type="tel" name="contact_phone"
+             class="form-control"
+             value="{{provider.contact_phone}}"
+             maxlength="100">
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Company Email</label>
+      <input type="email" name="contact_email"
+             class="form-control"
+             value="{{provider.contact_email}}"
+             maxlength="255">
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <h4>2. Contact Persons</h4>
+  <p class="text-muted">
+    Edit existing contacts or add new contact persons.
+  </p>
+
+  <div id="contacts">
+    {{#each contacts}}
+    <div class="contact-row border rounded p-3 mb-3">
+      <input type="hidden" name="contact_id[]"
+             value="{{contact_id}}">
+
+      <div class="d-flex justify-content-between">
+        <h5 class="contact-title">Contact Person</h5>
+        <button type="button"
+                class="btn btn-sm btn-outline-danger"
+                data-remove-contact>Remove</button>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Contact Name *</label>
+          <input name="contact_name[]" class="form-control"
+                 value="{{contact_name}}"
+                 maxlength="150" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Position</label>
+          <input name="position_title[]" class="form-control"
+                 value="{{position_title}}"
+                 maxlength="100">
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="person_phone[]"
+                 class="form-control"
+                 value="{{contact_phone}}"
+                 maxlength="100">
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Email Address</label>
+          <input type="email" name="person_email[]"
+                 class="form-control"
+                 value="{{contact_email}}"
+                 maxlength="255">
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">LINE ID</label>
+          <input name="line_id[]" class="form-control"
+                 value="{{line_id}}"
+                 maxlength="100">
+        </div>
+      </div>
+
+      <div class="form-check">
+        <input class="form-check-input"
+               type="radio"
+               name="primary_contact"
+               value=""
+               {{#if is_primary}}checked{{/if}}>
+        <label class="form-check-label">Primary Contact</label>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+
+  <button type="button" id="add-contact"
+          class="btn btn-outline-primary mb-4">
+    + Add Another Contact
+  </button>
+
+  <hr>
+
+  <a href="/suppliers/{{provider.provider_id}}"
+     class="btn btn-secondary">
+    Cancel
+  </a>
+
+  <button type="submit" class="btn btn-primary">
+    Save Changes
+  </button>
+</form>
+
+<template id="contact-template">
+  <div class="contact-row border rounded p-3 mb-3">
+    <input type="hidden" name="contact_id[]" value="">
+
+    <div class="d-flex justify-content-between">
+      <h5 class="contact-title">Contact Person</h5>
+      <button type="button"
+              class="btn btn-sm btn-outline-danger"
+              data-remove-contact>Remove</button>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Contact Name *</label>
+        <input name="contact_name[]"
+               class="form-control" required maxlength="150">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Position</label>
+        <input name="position_title[]"
+               class="form-control" maxlength="100">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Phone Number</label>
+        <input name="person_phone[]"
+               class="form-control" maxlength="100">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="person_email[]"
+               class="form-control" maxlength="255">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">LINE ID</label>
+        <input name="line_id[]"
+               class="form-control" maxlength="100">
+      </div>
+    </div>
+
+    <div class="form-check">
+      <input class="form-check-input"
+             type="radio" name="primary_contact" value="">
+      <label class="form-check-label">Primary Contact</label>
+    </div>
+  </div>
+</template>
+
+<script>
+  const contacts = document.getElementById('contacts');
+  const template = document.getElementById('contact-template');
+
+  function updateContacts() {
+    const rows = [...contacts.querySelectorAll('.contact-row')];
+
+    rows.forEach((row, index) => {
+      row.querySelector('.contact-title').textContent =
+        `Contact Person ${index + 1}`;
+
+      row.querySelector('[name="primary_contact"]').value =
+        String(index);
+
+      row.querySelector('[data-remove-contact]').disabled =
+        rows.length === 1;
+    });
+
+    if (rows.length && !rows.some(row =>
+      row.querySelector('[name="primary_contact"]').checked
+    )) {
+      rows[0].querySelector('[name="primary_contact"]').checked = true;
+    }
+  }
+
+  document.getElementById('add-contact').addEventListener(
+    'click', () => {
+      if (contacts.querySelectorAll('.contact-row').length >= 30) {
+        alert('Maximum 30 contacts allowed.');
+        return;
+      }
+
+      contacts.appendChild(template.content.cloneNode(true));
+      updateContacts();
+    }
+  );
+
+  contacts.addEventListener('click', event => {
+    const button = event.target.closest('[data-remove-contact]');
+    if (!button) return;
+
+    button.closest('.contact-row').remove();
+    updateContacts();
+  });
+
+  if (!contacts.querySelector('.contact-row')) {
+    document.getElementById('add-contact').click();
+  } else {
+    updateContacts();
+  }
+</script>

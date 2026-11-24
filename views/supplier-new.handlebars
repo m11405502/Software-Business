@@ -1,0 +1,207 @@
+
+<h1>Add Supplier</h1>
+<p class="text-muted">Register a supplier for Demo Contractor.</p>
+
+<form action="/suppliers" method="POST">
+
+  <h4>1. Company Information</h4>
+
+  <div class="mb-3">
+    <label class="form-label">Supplier Company Name *</label>
+    <input type="text" name="provider_name"
+           class="form-control" maxlength="255" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Supplier Categories *</label>
+
+    {{#each categories}}
+    <div class="form-check">
+      <input class="form-check-input"
+             type="checkbox"
+             name="category_ids"
+             value="{{category_id}}"
+             id="category-{{category_id}}">
+      <label class="form-check-label"
+             for="category-{{category_id}}">
+        {{category_name}}
+      </label>
+    </div>
+    {{/each}}
+    <small class="text-muted">
+      Select one or more categories.
+    </small>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">City / County</label>
+    <select name="city_or_county" class="form-select">
+      <option value="">Select location</option>
+      <option>Taipei City</option>
+      <option>New Taipei City</option>
+      <option>Taoyuan City</option>
+      <option>Taichung City</option>
+      <option>Tainan City</option>
+      <option>Kaohsiung City</option>
+      <option>Keelung City</option>
+      <option>Hsinchu City</option>
+      <option>Hsinchu County</option>
+      <option>Miaoli County</option>
+      <option>Changhua County</option>
+      <option>Nantou County</option>
+      <option>Yunlin County</option>
+      <option>Chiayi City</option>
+      <option>Chiayi County</option>
+      <option>Pingtung County</option>
+      <option>Yilan County</option>
+      <option>Hualien County</option>
+      <option>Taitung County</option>
+      <option>Penghu County</option>
+      <option>Kinmen County</option>
+      <option>Lienchiang County</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Company Address</label>
+    <input type="text" name="address"
+           class="form-control" maxlength="500">
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Company Phone</label>
+      <input type="tel" name="contact_phone"
+             class="form-control" maxlength="100">
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Company Email</label>
+      <input type="email" name="contact_email"
+             class="form-control" maxlength="255">
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <h4>2. Contact Persons</h4>
+  <p class="text-muted">
+    Add the persons responsible for quotation,
+    delivery, or other supplier communication.
+  </p>
+
+  <div id="contacts"></div>
+
+  <button type="button" id="add-contact"
+          class="btn btn-outline-primary mb-4">
+    + Add Another Contact
+  </button>
+
+  <hr>
+
+  <a href="/suppliers" class="btn btn-secondary">
+    Back to Suppliers
+  </a>
+
+ <button type="submit" class="btn btn-primary">
+  Save Supplier
+</button>
+
+</form>
+
+<template id="contact-template">
+  <div class="contact-row border rounded p-3 mb-3">
+    <div class="d-flex justify-content-between">
+      <h5 class="contact-title">Contact Person</h5>
+      <button type="button"
+              class="btn btn-sm btn-outline-danger"
+              data-remove-contact>
+        Remove
+      </button>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Contact Name *</label>
+        <input name="contact_name[]" class="form-control"
+               maxlength="150" required>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Position / Responsibility</label>
+        <input name="position_title[]" class="form-control"
+               maxlength="100">
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Phone Number</label>
+        <input type="tel" name="person_phone[]"
+               class="form-control" maxlength="100">
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="person_email[]"
+               class="form-control" maxlength="255">
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">LINE ID</label>
+        <input name="line_id[]" class="form-control"
+               maxlength="100"
+               placeholder="Optional LINE ID">
+      </div>
+    </div>
+
+    <div class="form-check">
+      <input class="form-check-input" type="radio"
+             name="primary_contact" value="">
+      <label class="form-check-label">
+        Primary Contact
+      </label>
+    </div>
+  </div>
+</template>
+
+<script>
+  const contacts = document.getElementById('contacts');
+  const template = document.getElementById('contact-template');
+
+  function updateContacts() {
+    const rows = [...contacts.querySelectorAll('.contact-row')];
+
+    rows.forEach((row, index) => {
+      row.querySelector('.contact-title').textContent =
+        `Contact Person ${index + 1}`;
+
+      row.querySelector('[name="primary_contact"]').value =
+        String(index);
+
+      row.querySelector('[data-remove-contact]').disabled =
+        rows.length === 1;
+    });
+
+    if (!rows.some(row =>
+      row.querySelector('[name="primary_contact"]').checked
+    )) {
+      rows[0].querySelector('[name="primary_contact"]').checked = true;
+    }
+  }
+
+  document.getElementById('add-contact').addEventListener(
+    'click', () => {
+      contacts.appendChild(template.content.cloneNode(true));
+      updateContacts();
+    }
+  );
+
+  contacts.addEventListener('click', event => {
+    const button = event.target.closest('[data-remove-contact]');
+    if (!button) return;
+
+    button.closest('.contact-row').remove();
+    updateContacts();
+  });
+
+  // Start with one contact person.
+  document.getElementById('add-contact').click();
+</script>

@@ -1,0 +1,40 @@
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1>Supplier Registry</h1>
+    <p class="mb-0">Contractor: Demo Contractor</p>
+  </div>
+
+  <a href="/suppliers/new" class="btn btn-primary">
+    + Add Supplier
+  </a>
+</div>
+
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Supplier Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each providers}}
+    <tr>
+      <td>{{provider_id}}</td>
+      <td>
+        <a href="/suppliers/{{provider_id}}">
+          {{provider_name}}
+        </a>
+      </td>
+      <td>{{contact_email}}</td>
+      <td>{{contact_phone}}</td>
+    </tr>
+    {{else}}
+    <tr>
+      <td colspan="4">No suppliers found.</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
