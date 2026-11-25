@@ -1,0 +1,235 @@
+
+<h1>Edit Procurement Requirement</h1>
+
+<a href="/requirements/{{requirement.requirement_id}}"
+   class="btn btn-outline-secondary mb-4">
+  Back to Requirement Details
+</a>
+
+<form id="editRequirementForm"
+      action="/requirements/{{requirement.requirement_id}}/update"
+      method="POST">
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4 class="mb-0">1. Requirement Information</h4>
+    </div>
+
+    <div class="card-body">
+
+      <div class="mb-3">
+        <label class="form-label">Requirement Title</label>
+        <input type="text"
+               name="title"
+               class="form-control"
+               value="{{requirement.title}}"
+               maxlength="255"
+               required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Project</label>
+        <select name="project_id" class="form-select" required>
+          {{#each projects}}
+          <option value="{{project_id}}"
+                  {{#if selected}}selected{{/if}}>
+            {{project_name}}
+          </option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Resource Category</label>
+        <select name="category_id" class="form-select" required>
+          {{#each categories}}
+          <option value="{{category_id}}"
+                  {{#if selected}}selected{{/if}}>
+            {{category_name}}
+          </option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Needed By</label>
+        <input type="date"
+               name="needed_by"
+               class="form-control"
+               value="{{requirement.needed_by}}">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select" required>
+          {{#each statuses}}
+          <option value="{{value}}"
+                  {{#if selected}}selected{{/if}}>
+            {{value}}
+          </option>
+          {{/each}}
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4 class="mb-0">2. Requirement Items</h4>
+    </div>
+
+    <div class="card-body">
+
+      <div id="requirementItems">
+
+        {{#each items}}
+        <div class="requirement-item border rounded p-3 mb-3">
+
+          <input type="hidden"
+                 name="item_id[]"
+                 value="{{item_id}}">
+
+          <h5 class="item-heading">Item {{line_no}}</h5>
+
+          <div class="mb-3">
+            <label class="form-label">Item Description</label>
+            <input type="text"
+                   name="item_description[]"
+                   class="form-control"
+                   value="{{item_description}}"
+                   maxlength="500"
+                   required>
+          </div>
+
+          <div class="row">
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Required Quantity</label>
+              <input type="number"
+                     name="required_qty[]"
+                     class="form-control quantity-input"
+                     value="{{required_qty}}"
+                     min="0.01"
+                     max="99999999999.99"
+                     step="0.01"
+                     required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Unit</label>
+              <select name="unit_id[]"
+                      class="form-select"
+                      required>
+                {{#each units}}
+                <option value="{{unit_id}}"
+                        {{#if selected}}selected{{/if}}>
+                  {{unit_code}}
+                </option>
+                {{/each}}
+              </select>
+            </div>
+
+          </div>
+
+          <button type="button"
+                  class="btn btn-outline-danger btn-sm remove-item">
+            Remove Item
+          </button>
+
+        </div>
+        {{/each}}
+
+      </div>
+
+      <button type="button"
+              id="addItem"
+              class="btn btn-outline-primary">
+        + Add Item
+      </button>
+
+      <p class="text-muted mt-3">
+        A requirement must have at least one item.
+        Maximum: 30 items.
+      </p>
+
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 mb-4">
+    <a href="/requirements/{{requirement.requirement_id}}"
+       class="btn btn-outline-secondary">
+      Cancel
+    </a>
+
+    <button type="submit" class="btn btn-primary">
+        Save Changes
+    </button>
+  </div>
+
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const container = document.getElementById('requirementItems');
+  const addButton = document.getElementById('addItem');
+
+  function updateNumbers() {
+    const rows = container.querySelectorAll('.requirement-item');
+
+    rows.forEach((row, index) => {
+      row.querySelector('.item-heading').textContent =
+        'Item ' + (index + 1);
+    });
+
+    addButton.disabled = rows.length >= 30;
+  }
+
+  // Display existing quantities with two decimal places.
+  container.querySelectorAll('.quantity-input').forEach(input => {
+    const number = Number(input.value);
+    if (input.value !== '' && Number.isFinite(number)) {
+      input.value = number.toFixed(2);
+    }
+  });
+
+  addButton.addEventListener('click', function () {
+    const rows = container.querySelectorAll('.requirement-item');
+
+    if (rows.length >= 30 || rows.length === 0) {
+      return;
+    }
+
+    const newRow = rows[0].cloneNode(true);
+
+    newRow.querySelectorAll('input').forEach(input => {
+      input.value = '';
+    });
+
+    newRow.querySelectorAll('select').forEach(select => {
+      select.selectedIndex = 0;
+    });
+
+    container.appendChild(newRow);
+    updateNumbers();
+  });
+
+  container.addEventListener('click', function (event) {
+    if (!event.target.classList.contains('remove-item')) {
+      return;
+    }
+
+    const rows = container.querySelectorAll('.requirement-item');
+
+    if (rows.length <= 1) {
+      alert('At least one requirement item is required.');
+      return;
+    }
+
+    event.target.closest('.requirement-item').remove();
+    updateNumbers();
+  });
+
+  updateNumbers();
+});
+</script>

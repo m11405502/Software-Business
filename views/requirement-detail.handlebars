@@ -1,0 +1,98 @@
+
+<h1>Procurement Requirement Details</h1>
+
+<div class="d-flex gap-2 mb-4">
+  <a href="/requirements"
+     class="btn btn-outline-secondary">
+    Back to Requirements
+  </a>
+
+  <a href="/requirements/{{requirement.requirement_id}}/edit"
+     class="btn btn-primary">
+    Edit Requirement
+  </a>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <h4 class="mb-0">{{requirement.title}}</h4>
+  </div>
+
+  <div class="card-body">
+    <h5>1. Requirement Information</h5>
+
+    <p><strong>Requirement ID:</strong>
+      {{requirement.requirement_id}}</p>
+
+    <p><strong>Project:</strong>
+      {{requirement.project_name}}</p>
+
+    <p><strong>Resource Category:</strong>
+      {{requirement.category_name}}</p>
+
+    <p><strong>Needed By:</strong>
+      {{requirement.needed_by}}</p>
+
+    <p><strong>Status:</strong>
+      <span class="badge bg-secondary">
+        {{requirement.status}}
+      </span>
+    </p>
+
+    <p><strong>Created At:</strong>
+      {{requirement.created_at}}</p>
+  </div>
+</div>
+
+<h4>2. Requirement Items</h4>
+
+<div class="table-responsive">
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>No.</th>
+        <th>Item Description</th>
+        <th class="text-end">Required Quantity</th>
+        <th>Unit</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{#each items}}
+      <tr>
+        <td>{{line_no}}</td>
+        <td>{{item_description}}</td>
+        <td class="text-end">{{quantity_display}}</td>
+        <td>{{unit_code}}</td>
+      </tr>
+      {{else}}
+      <tr>
+        <td colspan="4" class="text-center">
+          No requirement items found.
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+
+<hr class="my-4">
+
+<div class="mb-5">
+  <p class="text-muted small">
+    Deleting this requirement will permanently remove
+    the requirement and all its associated items.
+  </p>
+
+  <form
+    class="d-flex justify-content-end"
+    action="/requirements/{{requirement.requirement_id}}/delete"
+    method="POST"
+    onsubmit="return confirm('Are you sure you want to permanently delete this requirement and all its items?');">
+
+    <button type="submit" class="btn btn-outline-danger">
+      Delete Requirement
+    </button>
+
+  </form>
+</div>
