@@ -1395,6 +1395,482 @@ app.post('/requirements/:id/delete', async (req, res) => {
   }
 });
 
+const toIdArray = (value) => {
+  const arr = value === undefined ? [] : (Array.isArray(value) ? value : [value]);
+  return [...new Set(arr.map(Number).filter(id => Number.isSafeInteger(id) && id >= 1))];
+};
+
+const isValidDateStr = (str) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(str)) return false;
+  const d = new Date(`${str}T00:00:00Z`);
+  return Number.isFinite(d.getTime()) && d.toISOString().slice(0, 10) === str;
+};
+
+// --- DRAFT RFQs ---
+
+app.get('/rfqs', async (req, res) => {
+  try {
+    const [rfqs] = await db.execute(
+      `SELECT r.rfq_id, r.title,
+              DATE_FORMAT(r.response_deadline, '%Y-%m-%d') AS response_deadline,
+              r.status, req.title AS requirement_title
+       FROM rfqs r
+       JOIN requirements req ON r.requirement_id = req.requirement_id
+       WHERE r.company_id = ?
+       ORDER BY r.rfq_id DESC`,
+      [1]
+    );
+    res.render('rfqs', {
+      rfqs: rfqs.map(row => ({ ...row, is_draft: row.status === 'DRAFT' }))
+    });
+  } catch (err) {
+    console.error('RFQ list error:', err.code || err.message);
+    res.status(500).send('Could not load RFQs.');
+  }
+});
+
+app.get('/rfqs/new', async (req, res) => {
+  try {
+    const [requirements] = await db.execute(
+      `SELECT req.requirement_id, req.title, p.project_name
+       FROM requirements req
+       JOIN projects p ON req.project_id = p.project_id
+       WHERE p.company_id = ?
+       ORDER BY req.requirement_id DESC`,
+      [1]
+    );
+    const [providers] = await db.execute(
+      `SELECT provider_id, provider_name
+       FROM providers
+       WHERE company_id = ?
+       ORDER BY provider_name`,
+      [1]
+    );
+    res.render('rfq-new', {
+      requirements: requirements.map(r => ({ ...r })),
+      providers: providers.map(p => ({ ...p }))
+    });
+  } catch (err) {
+    console.error('New RFQ form error:', err.code || err.message);
+    res.status(500).send('Could not load RFQ form.');
+  }
+});
+
+app.post('/rfqs', async (req, res) => {
+  const companyId = 1;
+  const requirementId = Number(req.body.requirement_id);
+  const title = String(req.body.title || '').trim();
+  const deadline = String(req.body.response_deadline || '').trim();
+  const providerIds = toIdArray(req.body.provider_ids);
+
+  if (!Number.isSafeInteger(requirementId) || requirementId < 1 || !title || title.length > 255 || !isValidDateStr(deadline)) {
+    return res.status(400).send('Invalid RFQ input.');
+  }
+
+  let connection;
+  try {
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    const [reqs] = await connection.execute(
+      `SELECT req.requirement_id
+       FROM requirements req
+       JOIN projects p ON req.project_id = p.project_id
+       WHERE req.requirement_id = ? AND p.company_id = ?`,
+      [requirementId, companyId]
+    );
+    if (reqs.length === 0) {
+      await connection.rollback();
+      return res.status(400).send('Invalid requirement.');
+    }
+
+    const [rfqResult] = await connection.execute(
+      `INSERT INTO rfqs (company_id, requirement_id, title, response_deadline, status)
+       VALUES (?, ?, ?, ?, 'DRAFT')`,
+      [companyId, requirementId, title, deadline]
+    );
+    const rfqId = rfqResult.insertId;
+
+    for (const providerId of providerIds) {
+      const [provs] = await connection.execute(
+        `SELECT provider_id FROM providers WHERE provider_id = ? AND company_id = ?`,
+        [providerId, companyId]
+      );
+      if (provs.length === 0) {
+        await connection.rollback();
+        return res.status(400).send('Invalid supplier selected.');
+      }
+      await connection.execute(
+        `INSERT INTO rfq_invitations (rfq_id, provider_id) VALUES (?, ?)`,
+        [rfqId, providerId]
+      );
+    }
+
+    await connection.commit();
+    return res.redirect(303, `/rfqs/${rfqId}`);
+  } catch (err) {
+    if (connection) await connection.rollback();
+    console.error('Create RFQ error:', err.code || err.message);
+    return res.status(500).send('Could not create draft RFQ.');
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+app.get('/rfqs/:id', async (req, res) => {
+  const rfqId = Number(req.params.id);
+  if (!Number.isSafeInteger(rfqId) || rfqId < 1) {
+    return res.status(400).send('Invalid RFQ ID.');
+  }
+  try {
+    const [rfqs] = await db.execute(
+      `SELECT r.rfq_id, r.requirement_id, r.title,
+              DATE_FORMAT(r.response_deadline, '%Y-%m-%d') AS response_deadline,
+              r.status, req.title AS requirement_title, p.project_name
+       FROM rfqs r
+       JOIN requirements req ON r.requirement_id = req.requirement_id
+       JOIN projects p ON req.project_id = p.project_id
+       WHERE r.rfq_id = ? AND r.company_id = ?`,
+      [rfqId, 1]
+    );
+    if (rfqs.length === 0) return res.status(404).send('RFQ not found.');
+
+    const [items] = await db.execute(
+      `SELECT ri.line_no, ri.item_description, ri.required_qty, u.unit_code
+       FROM requirement_items ri
+       JOIN units u ON ri.unit_id = u.unit_id
+       WHERE ri.requirement_id = ?
+       ORDER BY ri.line_no`,
+      [rfqs[0].requirement_id]
+    );
+
+    const [invitations] = await db.execute(
+      `SELECT inv.invitation_id, pr.provider_name
+       FROM rfq_invitations inv
+       JOIN providers pr ON inv.provider_id = pr.provider_id
+       WHERE inv.rfq_id = ?
+       ORDER BY inv.invitation_id`,
+      [rfqId]
+    );
+
+    res.render('rfq-detail', {
+      rfq: { ...rfqs[0], is_draft: rfqs[0].status === 'DRAFT' },
+      items: items.map(i => ({ ...i })),
+      invitations: invitations.map(inv => ({ ...inv }))
+    });
+  } catch (err) {
+    console.error('RFQ detail error:', err.code || err.message);
+    res.status(500).send('Could not load RFQ detail.');
+  }
+});
+
+app.get('/rfqs/:id/edit', async (req, res) => {
+  const rfqId = Number(req.params.id);
+  if (!Number.isSafeInteger(rfqId) || rfqId < 1) {
+    return res.status(400).send('Invalid RFQ ID.');
+  }
+  try {
+    const [rfqs] = await db.execute(
+      `SELECT rfq_id, title, DATE_FORMAT(response_deadline, '%Y-%m-%d') AS response_deadline, status
+       FROM rfqs WHERE rfq_id = ? AND company_id = ?`,
+      [rfqId, 1]
+    );
+    if (rfqs.length === 0) return res.status(404).send('RFQ not found.');
+    if (rfqs[0].status !== 'DRAFT') {
+      return res.status(403).send('Issued RFQs cannot be edited.');
+    }
+
+    const [invited] = await db.execute(
+      `SELECT provider_id FROM rfq_invitations WHERE rfq_id = ?`,
+      [rfqId]
+    );
+    const invitedSet = new Set(invited.map(row => Number(row.provider_id)));
+
+    const [providers] = await db.execute(
+      `SELECT provider_id, provider_name FROM providers WHERE company_id = ? ORDER BY provider_name`,
+      [1]
+    );
+
+    res.render('rfq-edit', {
+      rfq: { ...rfqs[0] },
+      providers: providers.map(p => ({ ...p, selected: invitedSet.has(Number(p.provider_id)) }))
+    });
+  } catch (err) {
+    console.error('Edit RFQ error:', err.code || err.message);
+    res.status(500).send('Could not load edit RFQ form.');
+  }
+});
+
+app.post('/rfqs/:id/update', async (req, res) => {
+  const rfqId = Number(req.params.id);
+  const companyId = 1;
+  const title = String(req.body.title || '').trim();
+  const deadline = String(req.body.response_deadline || '').trim();
+  const providerIds = toIdArray(req.body.provider_ids);
+
+  if (!Number.isSafeInteger(rfqId) || rfqId < 1 || !title || title.length > 255 || !isValidDateStr(deadline)) {
+    return res.status(400).send('Invalid RFQ update input.');
+  }
+
+  let connection;
+  try {
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    const [rfqs] = await connection.execute(
+      `SELECT rfq_id, status FROM rfqs WHERE rfq_id = ? AND company_id = ? FOR UPDATE`,
+      [rfqId, companyId]
+    );
+    if (rfqs.length === 0) {
+      await connection.rollback();
+      return res.status(404).send('RFQ not found.');
+    }
+    if (rfqs[0].status !== 'DRAFT') {
+      await connection.rollback();
+      return res.status(403).send('Issued RFQs cannot be edited.');
+    }
+
+    await connection.execute(
+      `UPDATE rfqs SET title = ?, response_deadline = ? WHERE rfq_id = ? AND company_id = ?`,
+      [title, deadline, rfqId, companyId]
+    );
+
+    await connection.execute(`DELETE FROM rfq_invitations WHERE rfq_id = ?`, [rfqId]);
+    for (const providerId of providerIds) {
+      const [provs] = await connection.execute(
+        `SELECT provider_id FROM providers WHERE provider_id = ? AND company_id = ?`,
+        [providerId, companyId]
+      );
+      if (provs.length === 0) {
+        await connection.rollback();
+        return res.status(400).send('Invalid supplier selected.');
+      }
+      await connection.execute(
+        `INSERT INTO rfq_invitations (rfq_id, provider_id) VALUES (?, ?)`,
+        [rfqId, providerId]
+      );
+    }
+
+    await connection.commit();
+    return res.redirect(303, `/rfqs/${rfqId}`);
+  } catch (err) {
+    if (connection) await connection.rollback();
+    console.error('Update RFQ error:', err.code || err.message);
+    return res.status(500).send('Could not update draft RFQ.');
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+app.post('/rfqs/:id/delete', async (req, res) => {
+  const rfqId = Number(req.params.id);
+  if (!Number.isSafeInteger(rfqId) || rfqId < 1) {
+    return res.status(400).send('Invalid RFQ ID.');
+  }
+
+  let connection;
+  try {
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    const [rfqs] = await connection.execute(
+      `SELECT rfq_id, status FROM rfqs WHERE rfq_id = ? AND company_id = ? FOR UPDATE`,
+      [rfqId, 1]
+    );
+    if (rfqs.length === 0) {
+      await connection.rollback();
+      return res.status(404).send('RFQ not found.');
+    }
+    if (rfqs[0].status !== 'DRAFT') {
+      await connection.rollback();
+      return res.status(403).send('Issued RFQs cannot be deleted.');
+    }
+
+    await connection.execute(`DELETE FROM rfqs WHERE rfq_id = ? AND company_id = ?`, [rfqId, 1]);
+    await connection.commit();
+    return res.redirect(303, '/rfqs');
+  } catch (err) {
+    if (connection) await connection.rollback();
+    console.error('Delete RFQ error:', err.code || err.message);
+    return res.status(500).send('Could not delete draft RFQ.');
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+// --- DRAFT QUOTATIONS ---
+
+app.get('/quotations', async (req, res) => {
+  try {
+    const [quotations] = await db.execute(
+      `SELECT q.quotation_id, q.offered_quantity, q.unit_price, q.status,
+              r.rfq_id, r.title AS rfq_title, pr.provider_name
+       FROM quotations q
+       JOIN rfq_invitations inv ON q.invitation_id = inv.invitation_id
+       JOIN rfqs r ON inv.rfq_id = r.rfq_id
+       JOIN providers pr ON inv.provider_id = pr.provider_id
+       WHERE r.company_id = ?
+       ORDER BY q.quotation_id DESC`,
+      [1]
+    );
+    res.render('quotations', {
+      quotations: quotations.map(row => ({ ...row, is_draft: row.status === 'DRAFT' }))
+    });
+  } catch (err) {
+    console.error('Quotations list error:', err.code || err.message);
+    res.status(500).send('Could not load quotations.');
+  }
+});
+
+app.get('/quotations/new', async (req, res) => {
+  const preselectedId = Number(req.query.invitation_id);
+  try {
+    const [invitations] = await db.execute(
+      `SELECT inv.invitation_id, r.rfq_id, r.title AS rfq_title, pr.provider_name
+       FROM rfq_invitations inv
+       JOIN rfqs r ON inv.rfq_id = r.rfq_id
+       JOIN providers pr ON inv.provider_id = pr.provider_id
+       WHERE r.company_id = ?
+       ORDER BY inv.invitation_id DESC`,
+      [1]
+    );
+    res.render('quotation-new', {
+      invitations: invitations.map(inv => ({
+        ...inv,
+        selected: Number(inv.invitation_id) === preselectedId
+      }))
+    });
+  } catch (err) {
+    console.error('New quotation form error:', err.code || err.message);
+    res.status(500).send('Could not load quotation form.');
+  }
+});
+
+app.post('/quotations', async (req, res) => {
+  const invitationId = Number(req.body.invitation_id);
+  const qty = Number(req.body.offered_quantity);
+  const price = Number(req.body.unit_price);
+  const notes = String(req.body.notes || '').trim();
+
+  if (!Number.isSafeInteger(invitationId) || invitationId < 1 || !Number.isFinite(qty) || qty <= 0 || !Number.isFinite(price) || price < 0 || notes.length > 500) {
+    return res.status(400).send('Invalid quotation input.');
+  }
+
+  try {
+    const [inv] = await db.execute(
+      `SELECT inv.invitation_id
+       FROM rfq_invitations inv
+       JOIN rfqs r ON inv.rfq_id = r.rfq_id
+       WHERE inv.invitation_id = ? AND r.company_id = ?`,
+      [invitationId, 1]
+    );
+    if (inv.length === 0) return res.status(404).send('Invitation not found.');
+
+    await db.execute(
+      `INSERT INTO quotations (invitation_id, offered_quantity, unit_price, notes, status)
+       VALUES (?, ?, ?, ?, 'DRAFT')`,
+      [invitationId, qty, price, notes || null]
+    );
+    return res.redirect(303, '/quotations');
+  } catch (err) {
+    if (err.code === 'ER_DUP_ENTRY') {
+      return res.status(409).send('A quotation already exists for this invitation.');
+    }
+    console.error('Create quotation error:', err.code || err.message);
+    return res.status(500).send('Could not create draft quotation.');
+  }
+});
+
+app.get('/quotations/:id/edit', async (req, res) => {
+  const quotationId = Number(req.params.id);
+  if (!Number.isSafeInteger(quotationId) || quotationId < 1) {
+    return res.status(400).send('Invalid quotation ID.');
+  }
+  try {
+    const [rows] = await db.execute(
+      `SELECT q.quotation_id, q.offered_quantity, q.unit_price, q.notes, q.status,
+              r.rfq_id, r.title AS rfq_title, pr.provider_name
+       FROM quotations q
+       JOIN rfq_invitations inv ON q.invitation_id = inv.invitation_id
+       JOIN rfqs r ON inv.rfq_id = r.rfq_id
+       JOIN providers pr ON inv.provider_id = pr.provider_id
+       WHERE q.quotation_id = ? AND r.company_id = ?`,
+      [quotationId, 1]
+    );
+    if (rows.length === 0) return res.status(404).send('Quotation not found.');
+    if (rows[0].status !== 'DRAFT') {
+      return res.status(403).send('Submitted quotations cannot be edited.');
+    }
+    res.render('quotation-edit', { quotation: { ...rows[0] } });
+  } catch (err) {
+    console.error('Edit quotation error:', err.code || err.message);
+    res.status(500).send('Could not load quotation edit form.');
+  }
+});
+
+app.post('/quotations/:id/update', async (req, res) => {
+  const quotationId = Number(req.params.id);
+  const qty = Number(req.body.offered_quantity);
+  const price = Number(req.body.unit_price);
+  const notes = String(req.body.notes || '').trim();
+
+  if (!Number.isSafeInteger(quotationId) || quotationId < 1 || !Number.isFinite(qty) || qty <= 0 || !Number.isFinite(price) || price < 0 || notes.length > 500) {
+    return res.status(400).send('Invalid quotation update input.');
+  }
+
+  try {
+    const [rows] = await db.execute(
+      `SELECT q.quotation_id, q.status
+       FROM quotations q
+       JOIN rfq_invitations inv ON q.invitation_id = inv.invitation_id
+       JOIN rfqs r ON inv.rfq_id = r.rfq_id
+       WHERE q.quotation_id = ? AND r.company_id = ?`,
+      [quotationId, 1]
+    );
+    if (rows.length === 0) return res.status(404).send('Quotation not found.');
+    if (rows[0].status !== 'DRAFT') {
+      return res.status(403).send('Submitted quotations cannot be edited.');
+    }
+
+    await db.execute(
+      `UPDATE quotations SET offered_quantity = ?, unit_price = ?, notes = ? WHERE quotation_id = ?`,
+      [qty, price, notes || null, quotationId]
+    );
+    return res.redirect(303, '/quotations');
+  } catch (err) {
+    console.error('Update quotation error:', err.code || err.message);
+    return res.status(500).send('Could not update draft quotation.');
+  }
+});
+
+app.post('/quotations/:id/delete', async (req, res) => {
+  const quotationId = Number(req.params.id);
+  if (!Number.isSafeInteger(quotationId) || quotationId < 1) {
+    return res.status(400).send('Invalid quotation ID.');
+  }
+
+  try {
+    const [rows] = await db.execute(
+      `SELECT q.quotation_id, q.status
+       FROM quotations q
+       JOIN rfq_invitations inv ON q.invitation_id = inv.invitation_id
+       JOIN rfqs r ON inv.rfq_id = r.rfq_id
+       WHERE q.quotation_id = ? AND r.company_id = ?`,
+      [quotationId, 1]
+    );
+    if (rows.length === 0) return res.status(404).send('Quotation not found.');
+    if (rows[0].status !== 'DRAFT') {
+      return res.status(403).send('Submitted quotations cannot be deleted.');
+    }
+
+    await db.execute(`DELETE FROM quotations WHERE quotation_id = ?`, [quotationId]);
+    return res.redirect(303, '/quotations');
+  } catch (err) {
+    console.error('Delete quotation error:', err.code || err.message);
+    return res.status(500).send('Could not delete draft quotation.');
+  }
+});
+
 app.listen(port, host, () => {
   console.log(`Server running at http://${host}:${port}`);
 });

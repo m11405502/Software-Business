@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0">RFQ #{{rfq.rfq_id}}: {{rfq.title}}</h2>
+  <a href="/rfqs" class="btn btn-secondary">Back to RFQs</a>
+</div>
+
+<div class="card p-4 mb-4">
+  <p><strong>Requirement:</strong> {{rfq.requirement_title}} ({{rfq.project_name}})</p>
+  <p><strong>Response Deadline:</strong> {{rfq.response_deadline}}</p>
+  <p class="mb-0"><strong>Status:</strong> <span class="badge bg-secondary">{{rfq.status}}</span></p>
+</div>
+
+<h3 class="h5">Requested Items</h3>
+<table class="table table-bordered mb-4">
+  <thead>
+    <tr>
+      <th>Line</th>
+      <th>Description</th>
+      <th>Required Qty</th>
+      <th>Unit</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each items}}
+    <tr>
+      <td>{{this.line_no}}</td>
+      <td>{{this.item_description}}</td>
+      <td>{{this.required_qty}}</td>
+      <td>{{this.unit_code}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+<h3 class="h5">Invited Suppliers</h3>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Invitation ID</th>
+      <th>Supplier</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each invitations}}
+    <tr>
+      <td>#{{this.invitation_id}}</td>
+      <td>{{this.provider_name}}</td>
+      <td><a href="/quotations/new?invitation_id={{this.invitation_id}}" class="btn btn-sm btn-outline-primary">Create Draft Quote</a></td>
+    </tr>
+    {{else}}
+    <tr><td colspan="3" class="text-muted">No suppliers invited.</td></tr>
+    {{/each}}
+  </tbody>
+</table>
