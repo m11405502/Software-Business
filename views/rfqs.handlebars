@@ -1,0 +1,41 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0">Request for Quotations (RFQs)</h2>
+  <a href="/rfqs/new" class="btn btn-primary">New Draft RFQ</a>
+</div>
+
+<table class="table table-bordered table-striped align-middle">
+  <thead class="table-light">
+    <tr>
+      <th>ID</th>
+      <th>Title</th>
+      <th>Requirement</th>
+      <th>Deadline</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each rfqs}}
+    <tr>
+      <td>{{this.rfq_id}}</td>
+      <td><a href="/rfqs/{{this.rfq_id}}">{{this.title}}</a></td>
+      <td>{{this.requirement_title}}</td>
+      <td>{{this.response_deadline}}</td>
+      <td><span class="badge bg-secondary">{{this.status}}</span></td>
+      <td class="d-flex gap-2">
+        <a href="/rfqs/{{this.rfq_id}}" class="btn btn-sm btn-outline-secondary">View</a>
+        {{#if this.is_draft}}
+          <a href="/rfqs/{{this.rfq_id}}/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+          <form method="POST" action="/rfqs/{{this.rfq_id}}/delete" onsubmit="return confirm('Delete this draft RFQ?');">
+            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        {{/if}}
+      </td>
+    </tr>
+    {{else}}
+    <tr>
+      <td colspan="6" class="text-center text-muted">No RFQs found.</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

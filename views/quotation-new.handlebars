@@ -1,0 +1,35 @@
+<h2 class="h4 mb-3">Create Draft Quotation</h2>
+
+<form method="POST" action="/quotations" class="card p-4">
+  <div class="mb-3">
+    <label class="form-label">RFQ Invitation</label>
+    <select name="invitation_id" class="form-select" required>
+      <option value="">-- Select RFQ Invitation --</option>
+      {{#each invitations}}
+        <option value="{{this.invitation_id}}" {{#if this.selected}}selected{{/if}}>
+          Invite #{{this.invitation_id}} | RFQ #{{this.rfq_id}} ({{this.rfq_title}}) -> {{this.provider_name}}
+        </option>
+      {{/each}}
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Offered Quantity</label>
+    <input type="number" step="0.001" min="0.001" name="offered_quantity" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Unit Price</label>
+    <input type="number" step="0.01" min="0" name="unit_price" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Notes</label>
+    <input type="text" name="notes" class="form-control" maxlength="500">
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Save Draft Quotation</button>
+    <a href="/quotations" class="btn btn-secondary">Cancel</a>
+  </div>
+</form>

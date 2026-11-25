@@ -1,0 +1,25 @@
+<h2 class="h4 mb-3">Edit Draft Quotation #{{quotation.quotation_id}}</h2>
+
+<form method="POST" action="/quotations/{{quotation.quotation_id}}/update" class="card p-4">
+  <p><strong>RFQ:</strong> #{{quotation.rfq_id}} - {{quotation.rfq_title}} | <strong>Supplier:</strong> {{quotation.provider_name}}</p>
+
+  <div class="mb-3">
+    <label class="form-label">Offered Quantity</label>
+    <input type="number" step="0.001" min="0.001" name="offered_quantity" class="form-control" value="{{quotation.offered_quantity}}" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Unit Price</label>
+    <input type="number" step="0.01" min="0" name="unit_price" class="form-control" value="{{quotation.unit_price}}" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Notes</label>
+    <input type="text" name="notes" class="form-control" maxlength="500" value="{{quotation.notes}}">
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Update Draft</button>
+    <a href="/quotations" class="btn btn-secondary">Cancel</a>
+  </div>
+</form>

@@ -1,0 +1,42 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0">Quotations</h2>
+  <a href="/quotations/new" class="btn btn-primary">New Draft Quotation</a>
+</div>
+
+<table class="table table-bordered table-striped align-middle">
+  <thead class="table-light">
+    <tr>
+      <th>Quote ID</th>
+      <th>RFQ</th>
+      <th>Supplier</th>
+      <th>Offered Qty</th>
+      <th>Unit Price</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each quotations}}
+    <tr>
+      <td>{{this.quotation_id}}</td>
+      <td>#{{this.rfq_id}} - {{this.rfq_title}}</td>
+      <td>{{this.provider_name}}</td>
+      <td>{{this.offered_quantity}}</td>
+      <td>{{this.unit_price}}</td>
+      <td><span class="badge bg-secondary">{{this.status}}</span></td>
+      <td class="d-flex gap-2">
+        {{#if this.is_draft}}
+          <a href="/quotations/{{this.quotation_id}}/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+          <form method="POST" action="/quotations/{{this.quotation_id}}/delete" onsubmit="return confirm('Delete this draft quotation?');">
+            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        {{else}}
+          <span class="text-muted small">Submitted</span>
+        {{/if}}
+      </td>
+    </tr>
+    {{else}}
+    <tr><td colspan="7" class="text-center text-muted">No quotations found.</td></tr>
+    {{/each}}
+  </tbody>
+</table>
