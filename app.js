@@ -27,20 +27,62 @@ app.get('/categories', async (req, res) => {
   }
 });
 
+
 app.get('/suppliers', async (req, res) => {
   try {
-    const [providers] = await db.execute(
-      `SELECT provider_id, provider_name,
-              contact_email, contact_phone
-       FROM providers
-       WHERE company_id = ?
-       ORDER BY provider_name`,
+    const [rows] = await db.execute(
+      `SELECT p.provider_id,
+              p.provider_name,
+              p.city_or_county,
+              p.contact_email,
+              p.contact_phone,
+              rc.category_name
+       FROM providers p
+       LEFT JOIN provider_categories pc
+         ON p.provider_id = pc.provider_id
+       LEFT JOIN resource_categories rc
+         ON pc.category_id = rc.category_id
+       WHERE p.company_id = ?
+       ORDER BY p.provider_name,
+                p.provider_id,
+                rc.category_name`,
       [1]
     );
 
+    const providerMap = new Map();
+
+    for (const row of rows) {
+      if (!providerMap.has(row.provider_id)) {
+        providerMap.set(row.provider_id, {
+          provider_id: row.provider_id,
+          provider_name: row.provider_name,
+          city_or_county: row.city_or_county,
+          contact_email: row.contact_email,
+          contact_phone: row.contact_phone,
+          categories: []
+        });
+      }
+
+      const provider = providerMap.get(row.provider_id);
+
+      if (
+        row.category_name &&
+        !provider.categories.includes(row.category_name)
+      ) {
+        provider.categories.push(row.category_name);
+      }
+    }
+
+    const providers = Array.from(providerMap.values());
+
     res.render('suppliers', { providers });
+
   } catch (error) {
-    console.error('Supplier list error:', error.code);
+    console.error(
+      'Supplier list error:',
+      error.code || error.message
+    );
+
     res.status(500).send('Could not load suppliers.');
   }
 });

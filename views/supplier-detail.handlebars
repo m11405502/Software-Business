@@ -1,4 +1,3 @@
-
 <h1>Supplier Details</h1>
 
 <a href="/suppliers" class="btn btn-outline-secondary mb-4">
@@ -85,19 +84,3 @@
 {{else}}
 <p>No contact persons registered.</p>
 {{/each}}
-
-<hr class="my-4">
-
-<div class="d-flex justify-content-end">
-
-  <form action="/suppliers/{{provider.provider_id}}/delete"
-        method="POST"
-        onsubmit="return confirm('Are you sure you want to delete this supplier? This action cannot be undone.');">
-
-    <button type="submit" class="btn btn-outline-danger">
-      Delete Supplier
-    </button>
-
-  </form>
-
-</div>

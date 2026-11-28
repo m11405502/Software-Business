@@ -10,31 +10,101 @@
   </a>
 </div>
 
-<table class="table table-bordered table-striped">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Supplier Name</th>
-      <th>Email</th>
-      <th>Phone</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each providers}}
-    <tr>
-      <td>{{provider_id}}</td>
-      <td>
-        <a href="/suppliers/{{provider_id}}">
-          {{provider_name}}
-        </a>
-      </td>
-      <td>{{contact_email}}</td>
-      <td>{{contact_phone}}</td>
-    </tr>
-    {{else}}
-    <tr>
-      <td colspan="4">No suppliers found.</td>
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
+<div class="table-responsive">
+  <table class="table table-bordered table-striped align-middle">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Supplier Name</th>
+        <th>Categories</th>
+        <th>Location</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{#each providers}}
+      <tr>
+        <td>{{provider_id}}</td>
+
+        <td>
+          <a href="/suppliers/{{provider_id}}">
+            {{provider_name}}
+          </a>
+        </td>
+
+        <td>
+          {{#each categories}}
+            <span class="badge bg-primary me-1 mb-1">
+              {{this}}
+            </span>
+          {{else}}
+            <span class="text-muted">Not assigned</span>
+          {{/each}}
+        </td>
+
+        <td>
+          {{#if city_or_county}}
+            {{city_or_county}}
+          {{else}}
+            <span class="text-muted">—</span>
+          {{/if}}
+        </td>
+
+        <td>
+          {{#if contact_email}}
+            {{contact_email}}
+          {{else}}
+            <span class="text-muted">—</span>
+          {{/if}}
+        </td>
+
+        <td>
+          {{#if contact_phone}}
+            {{contact_phone}}
+          {{else}}
+            <span class="text-muted">—</span>
+          {{/if}}
+        </td>
+
+        <td>
+          <div class="d-flex gap-2 flex-wrap">
+
+            <a href="/suppliers/{{provider_id}}"
+               class="btn btn-sm btn-outline-primary">
+              View
+            </a>
+
+            <a href="/suppliers/{{provider_id}}/edit"
+               class="btn btn-sm btn-outline-warning">
+              Edit
+            </a>
+
+            <form action="/suppliers/{{provider_id}}/delete"
+                  method="POST"
+                  class="m-0"
+                  onsubmit="return confirm('Are you sure you want to delete this supplier? This action cannot be undone.');">
+
+              <button type="submit"
+                      class="btn btn-sm btn-outline-danger">
+                Delete
+              </button>
+
+            </form>
+
+          </div>
+        </td>
+      </tr>
+
+      {{else}}
+      <tr>
+        <td colspan="7" class="text-center text-muted">
+          No suppliers found.
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
